@@ -1,0 +1,16 @@
+
+
+{
+    "ships": [
+        {
+            "skin": "BASIC",
+            "health": 500,
+            "weaponType": "LASER"
+        },
+        {
+            "skin": "BASIC",
+            "health": 500,
+            "weaponType": "LASER"
+        }
+    ]
+}

@@ -1,11 +1,26 @@
 package starships.adapters;
 
+import edu.austral.ingsis.starships.ui.ElementColliderType;
 import edu.austral.ingsis.starships.ui.ElementModel;
-import starships.ShipController;
+import edu.austral.ingsis.starships.ui.ImageRef;
+import starships.entities.Ship;
+import starships.movement.Mover;
 
-public class StarshipUIAdapter implements CoreEntityToUIElementAdapter<ShipController> {
+public class StarshipUIAdapter implements CoreEntityToUIElementAdapter<Ship> {
+
+
+
     @Override
-    public ElementModel adapt(ShipController coreEntity) {
-
+    public ElementModel adapt(Mover<Ship> mover) {
+        return new ElementModel(
+                mover.getId(),
+                mover.getPosition().getX(),
+                mover.getPosition().getY(),
+                40.0,
+                40.0,
+                mover.getFacingDirection().getDegrees(),
+                ElementColliderType.Triangular,
+                new ImageRef("starship", 70.0, 70.0)
+        );
     }
 }

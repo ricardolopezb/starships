@@ -1,5 +1,8 @@
 package starships;
 
+import edu.austral.ingsis.starships.ui.ElementModel;
+import starships.adapters.CoreEntityToUIElementAdapter;
+import starships.adapters.StarshipUIAdapter;
 import starships.entities.Ship;
 import starships.entities.bullet.Bullet;
 import starships.entities.weapon.Weapon;
@@ -18,6 +21,10 @@ public class ShipController {
     public ShipController(ShipMover shipMover, Weapon weapon) {
         this.shipMover = shipMover;
         this.weapon = weapon;
+    }
+
+    public ElementModel adapt(){
+        return this.shipMover.adapt();
     }
 
     public ShipController update(){
@@ -57,7 +64,8 @@ public class ShipController {
                                     newShip.get(),
                                     this.shipMover.getPosition(),
                                     this.shipMover.getMovementVector(),
-                                    this.shipMover.getFacingDirection()
+                                    this.shipMover.getFacingDirection(),
+                                    this.shipMover.getMover().getAdapter()
                             )
                     ),
                     weapon)
@@ -66,4 +74,11 @@ public class ShipController {
         }
     }
 
+    public ShipMover getShipMover() {
+        return shipMover;
+    }
+
+    public Weapon getWeapon() {
+        return weapon;
+    }
 }

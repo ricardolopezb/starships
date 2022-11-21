@@ -1,0 +1,9 @@
+[
+    {
+        "accelerate": "W",
+        "brake": "S",
+        "rotate_clockwise": "D",
+        "rotate_counterclockwise": "A",
+        "shoot": "SPACE"
+    }
+]

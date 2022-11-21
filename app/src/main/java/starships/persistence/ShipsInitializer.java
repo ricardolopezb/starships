@@ -1,0 +1,68 @@
+package starships.persistence;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import starships.ShipController;
+import starships.adapters.StarshipUIAdapter;
+import starships.entities.Ship;
+import starships.entities.weapon.Weapon;
+import starships.entities.weapon.WeaponFactory;
+import starships.entities.weapon.WeaponType;
+import starships.movement.Mover;
+import starships.movement.ShipMover;
+import starships.physics.Position;
+import starships.physics.Vector;
+import starships.utils.IdGenerator;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+public class ShipsInitializer {
+
+    public List<ShipController> createShipControllers() throws IOException, ParseException {
+        Object obj = new JSONParser().parse(new FileReader(System.getProperty("user.dir") +
+                "/app/src/main/java/starships/persistence/config_file_test.json"));
+        JSONObject initialConfigJson = (JSONObject) obj;
+        List<ShipController> shipControllers = new ArrayList<>();
+        JSONArray listOfShips = (JSONArray) initialConfigJson.get("ships");
+        Iterator it = listOfShips.iterator();
+        Integer idNumber = 1;
+        while(it.hasNext()){
+            shipControllers.add(createShipController((JSONObject) it.next(), idNumber));
+            idNumber++;
+        }
+        return shipControllers;
+    }
+
+    private ShipController createShipController(JSONObject initialConfigJson, Integer shipIdNumber) {
+        String shipSkin = (String) initialConfigJson.get("skin");
+        Integer shipHealth = ((Long) initialConfigJson.get("health")).intValue();
+        String weaponType = (String) initialConfigJson.get("weaponType");
+
+        ShipMover shipMover = createShipMover(shipSkin, shipHealth, shipIdNumber);
+        Weapon weapon = WeaponFactory.createWeaponForType(WeaponType.valueOf(weaponType), shipMover.getMover());
+
+        return new ShipController(shipMover, weapon);
+
+
+    }
+
+    private static ShipMover createShipMover(String shipSkin, Integer shipHealth, Integer shipIdNumber) {
+        Mover<Ship> mover = new Mover<>(
+                new Ship("Ship-"+shipIdNumber, shipHealth, shipSkin),
+                new Position(300, 300),
+                new Vector(0D),
+                new Vector(180D),
+                new StarshipUIAdapter()
+        );
+
+        ShipMover shipMover = new ShipMover(mover);
+        return shipMover;
+    }
+}

@@ -1,9 +1,5 @@
 package starships.entities;
 
-import starships.entities.weapon.Weapon;
-import starships.entities.weapon.WeaponType;
-import starships.physics.Position;
-
 import java.util.Optional;
 
 public class Ship extends BaseEntity{

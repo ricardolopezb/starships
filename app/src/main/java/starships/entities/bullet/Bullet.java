@@ -8,7 +8,7 @@ public class Bullet extends BaseEntity {
     private final Integer size;
 
     public Bullet(String id, BulletType type, Integer damage, Integer size) {
-        super(id);
+        super(id, adapter);
         this.type = type;
         this.damage = damage;
         this.size = size;

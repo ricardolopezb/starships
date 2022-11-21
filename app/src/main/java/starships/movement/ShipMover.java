@@ -1,5 +1,7 @@
 package starships.movement;
 
+import edu.austral.ingsis.starships.ui.ElementModel;
+import starships.adapters.StarshipUIAdapter;
 import starships.entities.Ship;
 import starships.physics.Position;
 import starships.physics.Vector;
@@ -17,7 +19,7 @@ public class ShipMover {
         Vector accelerationDirection = facingDirection.multiply(coefficient);
         Vector newCurrentMovement = currentMovement.sum(accelerationDirection);
 
-        Mover<Ship> newMover = new Mover<>(mover.getEntity(), mover.getPosition(), newCurrentMovement, mover.getFacingDirection());
+        Mover<Ship> newMover = new Mover<>(mover.getEntity(), mover.getPosition(), newCurrentMovement, mover.getFacingDirection(), mover.getAdapter());
 
         return new ShipMover(newMover);
 
@@ -27,7 +29,7 @@ public class ShipMover {
     public ShipMover rotate(Integer degrees){
         Vector facingDirection = mover.getFacingDirection();
         Vector newFacingDirection = new Vector(facingDirection.getDegrees() + degrees);
-        Mover<Ship> newMover = new Mover<>(mover.getEntity(), mover.getPosition(), mover.getMovementVector(), newFacingDirection);
+        Mover<Ship> newMover = new Mover<>(mover.getEntity(), mover.getPosition(), mover.getMovementVector(), newFacingDirection, mover.getAdapter());
         return new ShipMover(newMover);
     }
 
@@ -52,5 +54,9 @@ public class ShipMover {
 
     public String getId() {
         return mover.getId();
+    }
+
+    public ElementModel adapt() {
+        return this.mover.adapt();
     }
 }
