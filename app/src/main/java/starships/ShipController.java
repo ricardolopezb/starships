@@ -28,7 +28,8 @@ public class ShipController {
     }
 
     public ShipController update(){
-        return new ShipController(this.shipMover.updatePosition(), this.weapon); // todo confirmar si esto esta bien como inmutable
+        ShipMover newShipMover = this.shipMover.updatePosition();
+        return new ShipController(newShipMover, new Weapon(WeaponDTO.fromWeapon(this.weapon), newShipMover.getMover())); // todo confirmar si esto esta bien como inmutable
 
     }
 

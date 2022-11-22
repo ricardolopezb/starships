@@ -29,4 +29,8 @@ public class BulletFactory {
             default -> {return null;}
         }
     }
+
+    public BulletType getBulletType() {
+        return bulletType;
+    }
 }

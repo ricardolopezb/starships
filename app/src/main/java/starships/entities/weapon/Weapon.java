@@ -16,6 +16,7 @@ public class Weapon {
     private final ShotType shotType;
     private final MultipleSpawner<Bullet> multipleSpawner;
     private final Integer bulletsPerShot;
+    private final Double shotSpeed;
 
     // Aca le estoy pasando el mover al SpawnerFactory, para que con el pueda obtener lo que necesita para cada uno
     //para el radial, solo toma la posicion,
@@ -26,17 +27,19 @@ public class Weapon {
         this.weaponType = weaponType;
         this.shotType = shotType;
         final MultipleBulletSpawnerFactory factory = new MultipleBulletSpawnerFactory();
+        this.shotSpeed = shotSpeed;
         this.multipleSpawner = factory.getSpawnerForShotType(shotType, mover, shotSpeed);
         this.bulletsPerShot = bulletsPerShot;
     }
 
     public Weapon(WeaponDTO dto, Mover<Ship> mover){
-        this.bulletFactory = new BulletFactory(dto.bulletType());
-        this.weaponType = dto.weaponType();
-        this.shotType = dto.shotType();
+        this.bulletFactory = new BulletFactory(dto.getBulletType());
+        this.weaponType = dto.getWeaponType();
+        this.shotType = dto.getShotType();
+        this.shotSpeed = dto.getShotSpeed();
         final MultipleBulletSpawnerFactory factory = new MultipleBulletSpawnerFactory();
-        this.multipleSpawner = factory.getSpawnerForShotType(shotType, mover, dto.shotSpeed());
-        this.bulletsPerShot = dto.bulletsPerShot();
+        this.multipleSpawner = factory.getSpawnerForShotType(shotType, mover, dto.getShotSpeed());
+        this.bulletsPerShot = dto.getBulletsPerShot();
     }
 
     public List<Mover<Bullet>> shoot(String ownerId){
@@ -44,9 +47,13 @@ public class Weapon {
         return multipleSpawner.spawnMultiple(bullets);
     }
 
+    public Double getShotSpeed(){return shotSpeed;}
+
     public BulletFactory getBulletFactory() {
         return bulletFactory;
     }
+
+    public BulletType getBulletType(){return bulletFactory.getBulletType();}
 
     public WeaponType getWeaponType() {
         return weaponType;
@@ -58,5 +65,9 @@ public class Weapon {
 
     public MultipleSpawner<Bullet> getMultipleSpawner() {
         return multipleSpawner;
+    }
+
+    public Integer getBulletsPerShot() {
+        return bulletsPerShot;
     }
 }
