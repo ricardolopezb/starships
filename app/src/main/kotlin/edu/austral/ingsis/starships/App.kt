@@ -50,7 +50,7 @@ class Starships() : Application() {
 //        val keyPressedListener = KeyPressedListener(ships)
 //        keyPressedListener.insertBindings()
 //        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(ships, facade.elements))
-        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(gameEngine.ships[0]))
+        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(gameEngine.ships))
 
         val scene = Scene(facade.view)
         keyTracker.scene = scene
@@ -126,7 +126,7 @@ class CollisionListener() : EventListener<Collision> {
 
 }
 
-class KeyPressedListener(private val ship: ShipController): EventListener<KeyPressed> {
+class KeyPressedListener(private val ships: List<ShipController>): EventListener<KeyPressed> {
 
     var keyBindingMap = insertBindings()
 
@@ -207,10 +207,10 @@ class KeyPressedListener(private val ship: ShipController): EventListener<KeyPre
 //
 //
 //        }
-
-        for ((shipId, keyCodeList) in keyBindingMap.entries.iterator()) {
+        ships.forEach {
+            for ((shipId, keyCodeList) in keyBindingMap.entries.iterator()) {
 //            val (shipId, keyCodeList) = it
-            if(shipId.equals(ship.id)){
+                if(shipId.equals(it.id)){
 //                when (pressedKey) {
 //                    keyCodeList["accelerate"] -> {
 //                        println("before = " + facadeElements[shipId]?.y?.value)
@@ -222,25 +222,28 @@ class KeyPressedListener(private val ship: ShipController): EventListener<KeyPre
 //                    else -> {}
 //                }
 
-                when(pressedKey){
-                    keyCodeList["accelerate"] -> {
-                        gameEngine = gameEngine.accelerateShip(shipId, 0.5)
+                    when(pressedKey){
+                        keyCodeList["accelerate"] -> {
+                            gameEngine = gameEngine.accelerateShip(shipId, 0.5)
+                        }
+                        keyCodeList["brake"] -> {
+                            gameEngine = gameEngine.accelerateShip(shipId, -0.4)
+                        }
+                        keyCodeList["rotate_clockwise"] -> {
+                            gameEngine = gameEngine.rotateShip(shipId, 20)
+                        }
+                        keyCodeList["rotate_counterclockwise"] -> {
+                            gameEngine = gameEngine.rotateShip(shipId, -20)
+                        }
+                        keyCodeList["shoot"] -> {
+                            println("shooting!")
+                        }
+                        else -> {}
                     }
-                    keyCodeList["brake"] -> {
-                        gameEngine = gameEngine.accelerateShip(shipId, -0.4)
-                    }
-                    keyCodeList["rotate_clockwise"] -> {
-                        gameEngine = gameEngine.rotateShip(shipId, 20)
-                    }
-                    keyCodeList["rotate_counterclockwise"] -> {
-                        gameEngine = gameEngine.rotateShip(shipId, -20)
-                    }
-                    keyCodeList["shoot"] -> {
-                        println("shooting!")
-                    }
-                    else -> {}
                 }
-            }
+        }
+
+
 
         }
 

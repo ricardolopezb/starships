@@ -7,10 +7,10 @@
         "shoot": "SPACE"
     },
     {
-        "accelerate": "U",
-        "brake": "I",
-        "rotate_clockwise": "O",
-        "rotate_counterclockwise": "P",
+        "accelerate": "UP",
+        "brake": "DOWN",
+        "rotate_clockwise": "RIGHT",
+        "rotate_counterclockwise": "LEFT",
         "shoot": "L"
     }
 ]
