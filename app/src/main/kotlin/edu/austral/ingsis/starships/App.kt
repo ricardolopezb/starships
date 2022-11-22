@@ -208,7 +208,7 @@ class KeyPressedListener(private val ships: List<ShipController>, private val en
                             gameEngine = gameEngine.rotateShip(shipId, -20)
                         }
                         keyCodeList["shoot"] -> {
-                            gameEngine = gameEngine.shoot(shipId )
+                            gameEngine = gameEngine.shoot(shipId)
                             //entityInserter.insert(emptyList())
                         }
                         else -> {}

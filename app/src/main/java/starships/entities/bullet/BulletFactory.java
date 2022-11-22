@@ -24,7 +24,7 @@ public class BulletFactory {
     private Bullet createBulletForType(String ownerId) {
         switch (this.bulletType) {
             case LASER -> {return new Bullet("Bullet-"+ IdGenerator.generateId(), BulletType.LASER, 10, 2, ownerId);}
-            case PLASMA -> {return new Bullet("Bullet-"+ IdGenerator.generateId(), BulletType.PLASMA, 14, 2, ownerId);}
+            //case PLASMA -> {return new Bullet("Bullet-"+ IdGenerator.generateId(), BulletType.PLASMA, 14, 2, ownerId);}
             case EXPLOSIVE -> {return new Bullet("Bullet-"+ IdGenerator.generateId(), BulletType.EXPLOSIVE, 15, 4, ownerId);}
             default -> {return null;}
         }

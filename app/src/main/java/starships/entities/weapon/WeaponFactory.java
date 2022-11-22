@@ -21,8 +21,8 @@ public class WeaponFactory {
                     WeaponType.EXPLOSIVE,
                     BulletType.EXPLOSIVE,
                     ShotType.RADIAL,
-                    1,
-                    0.3,
+                    4,
+                    2.0,
                     mover
             );
 
