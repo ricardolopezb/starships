@@ -57,8 +57,8 @@ public class ShipsInitializer {
         Mover<Ship> mover = new Mover<>(
                 new Ship("Ship-"+shipIdNumber, shipHealth, shipSkin),
                 new Position(300, 300),
+                new Vector(0D,0D),
                 new Vector(0D),
-                new Vector(180D),
                 new StarshipUIAdapter()
         );
 

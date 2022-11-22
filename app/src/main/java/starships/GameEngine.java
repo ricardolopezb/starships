@@ -1,5 +1,6 @@
 package starships;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -36,6 +37,39 @@ public class GameEngine {
         this.ships = new ArrayList<>();
         this.scores = new HashMap<>();
     }
+
+    public GameEngine accelerateShip(String shipId, Double coef) {
+        for (ShipController ship : ships) {
+            if(ship.getId().equals(shipId)){
+                ShipController acceleratedShip = ship.accelerate(coef);
+                List<ShipController> newList = replaceShip(ship, acceleratedShip);
+                return new GameEngine(this.movingEntities, newList, scores);
+            }
+
+        }
+        return this;
+    }
+
+    public GameEngine rotateShip(String shipId, Integer degrees) {
+        for (ShipController ship : ships) {
+            if(ship.getId().equals(shipId)){
+                ShipController acceleratedShip = ship.rotate(degrees);
+                List<ShipController> newList = replaceShip(ship, acceleratedShip);
+                return new GameEngine(this.movingEntities, newList, scores);
+            }
+
+        }
+        return this;
+    }
+
+    @NotNull
+    private List<ShipController> replaceShip(ShipController ship, ShipController acceleratedShip) {
+        ships.remove(ship);
+        List<ShipController> newList = new ArrayList<>(ships);
+        newList.add(acceleratedShip);
+        return newList;
+    }
+
 
     public GameEngine initialize() throws IOException, ParseException {
         ShipsInitializer shipsInitializer = new ShipsInitializer();

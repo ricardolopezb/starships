@@ -18,7 +18,7 @@ public class StarshipUIAdapter implements CoreEntityToUIElementAdapter<Ship> {
                 mover.getPosition().getY(),
                 40.0,
                 40.0,
-                mover.getFacingDirection().getDegrees(),
+                mover.getFacingDirection().getDegrees() + 270,
                 ElementColliderType.Triangular,
                 new ImageRef("starship", 70.0, 70.0)
         );

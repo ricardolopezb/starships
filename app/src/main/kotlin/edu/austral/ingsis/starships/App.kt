@@ -1,7 +1,6 @@
 package edu.austral.ingsis.starships
 
 import edu.austral.ingsis.starships.ui.*
-import edu.austral.ingsis.starships.ui.ElementColliderType.*
 import javafx.application.Application
 import javafx.application.Application.launch
 import javafx.scene.Scene
@@ -12,6 +11,8 @@ import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import starships.GameEngine
 import starships.ShipController
+import starships.entities.BaseEntity
+import starships.movement.Mover
 import java.io.FileReader
 
 fun main() {
@@ -44,10 +45,12 @@ class Starships() : Application() {
 
         facade.timeListenable.addEventListener(TimeListener(facade.elements))
         facade.collisionsListenable.addEventListener(CollisionListener())
+        val ship = gameEngine.ships[0].adapt()
         val ships = facade.elements.filter { (key, _) -> key.startsWith("Ship") }
 //        val keyPressedListener = KeyPressedListener(ships)
 //        keyPressedListener.insertBindings()
-        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(ships, facade.elements))
+//        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(ships, facade.elements))
+        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(gameEngine.ships[0]))
 
         val scene = Scene(facade.view)
         keyTracker.scene = scene
@@ -78,19 +81,25 @@ class Starships() : Application() {
 
 class TimeListener(private val elements: Map<String, ElementModel>) : EventListener<TimePassed> {
     override fun handle(event: TimePassed) {
+        val newShipList = ArrayList<ShipController>()
+        val newMoverList = ArrayList<Mover<BaseEntity>>()
         gameEngine.ships.forEach {
-            val updatedShipElementModel = it.update().adapt()
+            val updatedShip = it.update()
+            val updatedShipElementModel = updatedShip.adapt()
             elements[it.id]?.x?.set(updatedShipElementModel.x.value)
             elements[it.id]?.y?.set(updatedShipElementModel.y.value)
             elements[it.id]?.rotationInDegrees?.set(updatedShipElementModel.rotationInDegrees.value)
+            newShipList.add(updatedShip)
         }
         gameEngine.movingEntities.forEach {
-            val updatedMover = it.updatePosition().adapt()
-            elements[it.id]?.x?.set(updatedMover.x.value)
-            elements[it.id]?.y?.set(updatedMover.y.value)
-            elements[it.id]?.rotationInDegrees?.set(updatedMover.rotationInDegrees.value)
+            val updatedMover = it.updatePosition()
+            val updatedMoverElementModel = updatedMover.adapt()
+            elements[it.id]?.x?.set(updatedMoverElementModel.x.value)
+            elements[it.id]?.y?.set(updatedMoverElementModel.y.value)
+            elements[it.id]?.rotationInDegrees?.set(updatedMoverElementModel.rotationInDegrees.value)
+            newMoverList.add(updatedMover)
         }
-
+        gameEngine = GameEngine(newMoverList, newShipList, gameEngine.scores)
 //        elements.forEach {
 //            val (key, element) = it
 //            when(key) {
@@ -117,9 +126,9 @@ class CollisionListener() : EventListener<Collision> {
 
 }
 
-class KeyPressedListener(private val ships: Map<String, ElementModel>, private val facadeElems: Map<String, ElementModel>): EventListener<KeyPressed> {
+class KeyPressedListener(private val ship: ShipController): EventListener<KeyPressed> {
 
-    val keyBindingMap = insertBindings()
+    var keyBindingMap = insertBindings()
 
     fun insertBindings(): Map<String, Map<String, KeyCode>>{
         val mapToReturn = HashMap<String, Map<String, KeyCode>>()
@@ -162,40 +171,76 @@ class KeyPressedListener(private val ships: Map<String, ElementModel>, private v
         // verlo con la rotacion
 
 
-        for ((shipId, keyCodeList) in keyBindingMap.entries.iterator()){
-//            val (shipId, keyCodeList) = it
-            val starship = ships[shipId]!!
-            when(pressedKey){
-                keyCodeList["accelerate"] -> {
-                    var foundShip: ShipController? = null
-                    for (ship in gameEngine.ships.iterator()){
-                        if(ship.id.equals(shipId)) foundShip = ship
-                    }
-                    val acceleratedShipElementModel = foundShip!!.accelerate(3.0).update().adapt()
-                    starship.y.set(acceleratedShipElementModel.y.value + 5) //no esta actualizando el valor
-                    print(starship.y.value)
-                }
-                keyCodeList["brake"] -> ships[shipId]?.y?.set(ships[shipId]?.y?.value!! - 5 )
-                keyCodeList["rotate_clockwise"] -> {
-                    print("before = " + starship.rotationInDegrees.value)
-                    var foundShip: ShipController? = null
-                    for (ship in gameEngine.ships.iterator()){
-                        if(ship.id.equals(shipId)) foundShip = ship
-                    }
-                    val newRotatedShipController = foundShip!!.rotate(100).update()
-                    val acceleratedShipElementModel = newRotatedShipController.adapt()
-                    starship.rotationInDegrees.set(acceleratedShipElementModel.rotationInDegrees.value) //no esta actualizando el valor
-                    print("after = " + starship.rotationInDegrees.value)
-                }
-                keyCodeList["rotate_counterclockwise"] -> ships[shipId]?.x?.set(ships[shipId]?.x?.value!! - 5 )
-//                keyCodeList["accelerate"] -> print("accelerating!$starship")
-//                keyCodeList["brake"] -> print("braking!")
-//                keyCodeList["rotate_clockwise"] -> print("rotating clockwise")
-//                keyCodeList["rotate_counterclockwise"] -> print("rotating counterclock")
-//                keyCodeList["shoot"] -> print("shooting! - shipId = "+ shipId)
-                else -> {}
-            }
+//        for ((shipId, keyCodeList) in keyBindingMap.entries.iterator()){
+////            val (shipId, keyCodeList) = it
+//            val starship = ships[shipId]!!
+//            when(pressedKey){
+//                keyCodeList["accelerate"] -> {
+//                    var foundShip: ShipController? = null
+//                    for (ship in gameEngine.ships.iterator()){
+//                        if(ship.id.equals(shipId)) foundShip = ship
+//                    }
+//                    val acceleratedShipElementModel = foundShip!!.accelerate(3.0).update().adapt()
+//                    starship.y.set(acceleratedShipElementModel.y.value + 5) //no esta actualizando el valor
+//                    print(starship.y.value)
+//                }
+//                keyCodeList["brake"] -> ships[shipId]?.y?.set(ships[shipId]?.y?.value!! - 5 )
+//                keyCodeList["rotate_clockwise"] -> {
+//                    print("before = " + starship.rotationInDegrees.value)
+//                    var foundShip: ShipController? = null
+//                    for (ship in gameEngine.ships.iterator()){
+//                        if(ship.id.equals(shipId)) foundShip = ship
+//                    }
+//                    val newRotatedShipController = foundShip!!.rotate(100).update()
+//                    val acceleratedShipElementModel = newRotatedShipController.adapt()
+//                    starship.rotationInDegrees.set(acceleratedShipElementModel.rotationInDegrees.value) //no esta actualizando el valor
+//                    print("after = " + starship.rotationInDegrees.value)
+//                }
+//                keyCodeList["rotate_counterclockwise"] -> ships[shipId]?.x?.set(ships[shipId]?.x?.value!! - 5 )
+////                keyCodeList["accelerate"] -> print("accelerating!$starship")
+////                keyCodeList["brake"] -> print("braking!")
+////                keyCodeList["rotate_clockwise"] -> print("rotating clockwise")
+////                keyCodeList["rotate_counterclockwise"] -> print("rotating counterclock")
+////                keyCodeList["shoot"] -> print("shooting! - shipId = "+ shipId)
+//                else -> {}
+//            }
+//
+//
+//        }
 
+        for ((shipId, keyCodeList) in keyBindingMap.entries.iterator()) {
+//            val (shipId, keyCodeList) = it
+            if(shipId.equals(ship.id)){
+//                when (pressedKey) {
+//                    keyCodeList["accelerate"] -> {
+//                        println("before = " + facadeElements[shipId]?.y?.value)
+//                        val updatedShipController = ship.accelerate(300.0).update()
+//                        val acceleratedShipElementModel = updatedShipController.update().update().adapt()
+//                        facadeElements[shipId]?.y?.set(acceleratedShipElementModel.y.value) //no esta actualizando el valor
+//                        println("After = " + facadeElements[shipId]?.y?.value)
+//                    }
+//                    else -> {}
+//                }
+
+                when(pressedKey){
+                    keyCodeList["accelerate"] -> {
+                        gameEngine = gameEngine.accelerateShip(shipId, 0.5)
+                    }
+                    keyCodeList["brake"] -> {
+                        gameEngine = gameEngine.accelerateShip(shipId, -0.4)
+                    }
+                    keyCodeList["rotate_clockwise"] -> {
+                        gameEngine = gameEngine.rotateShip(shipId, 20)
+                    }
+                    keyCodeList["rotate_counterclockwise"] -> {
+                        gameEngine = gameEngine.rotateShip(shipId, -20)
+                    }
+                    keyCodeList["shoot"] -> {
+                        println("shooting!")
+                    }
+                    else -> {}
+                }
+            }
 
         }
 
