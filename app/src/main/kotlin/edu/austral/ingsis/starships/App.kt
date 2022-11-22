@@ -32,7 +32,7 @@ class Starships() : Application() {
     override fun start(primaryStage: Stage) {
         gameEngine = GameEngine().initialize()
         insertCoreEntitiesIntoUI()
-        val entityInserter = EntityInserter(facade)
+        val entityInSceneManager = EntityInSceneManager(facade)
 //        val bullet =  ElementModel(
 //                "lmao",
 //                350.0,
@@ -53,14 +53,16 @@ class Starships() : Application() {
 
 //        val starship = ElementModel("starship", 300.0, 300.0, 40.0, 40.0, 270.0, Triangular, STARSHIP_IMAGE_REF)
 
-        facade.timeListenable.addEventListener(TimeListener(facade.elements, entityInserter))
+        facade.timeListenable.addEventListener(TimeListener(facade.elements, entityInSceneManager))
         facade.collisionsListenable.addEventListener(CollisionListener())
+        facade.outOfBoundsListenable.addEventListener(OutOfBoundsListener())
+        facade.reachBoundsListenable.addEventListener(ReachBoundsListener())
 //        val ship = gameEngine.ships[0].adapt()
 //        val ships = facade.elements.filter { (key, _) -> key.startsWith("Ship") }
 ////        val keyPressedListener = KeyPressedListener(ships)
 //        keyPressedListener.insertBindings()
 //        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(ships, facade.elements))
-        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(gameEngine.ships, entityInserter))
+        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(gameEngine.ships, entityInSceneManager))
 
         val scene = Scene(facade.view)
         keyTracker.scene = scene
@@ -89,7 +91,7 @@ class Starships() : Application() {
     }
 }
 
-class EntityInserter(private val facade: ElementsViewFacade){
+class EntityInSceneManager(private val facade: ElementsViewFacade){
 
     fun insert(entities: List<ElementModel>) {
 //        for (entity in entities.iterator()){
@@ -102,10 +104,14 @@ class EntityInserter(private val facade: ElementsViewFacade){
         facade.elements[entity.id] = entity
     }
 
+    fun removeById(entityId: String){
+        facade.elements.remove(entityId)
+    }
+
 }
 
 class TimeListener(private val elements: Map<String, ElementModel>,
-                   private val inserter: EntityInserter) : EventListener<TimePassed> {
+                   private val inserter: EntityInSceneManager) : EventListener<TimePassed> {
     override fun handle(event: TimePassed) {
         val newShipList = ArrayList<ShipController>()
         val newMoverList = ArrayList<Mover<BaseEntity>>()
@@ -128,11 +134,14 @@ class TimeListener(private val elements: Map<String, ElementModel>,
             } else {
                 inserter.insert(updatedMoverElementModel)
             }
-
-
             newMoverList.add(updatedMover)
         }
-        gameEngine = GameEngine(newMoverList, newShipList, gameEngine.scores)
+        gameEngine.removedIds.forEach{
+            if(elements.containsKey(it)){
+                inserter.removeById(it)
+            }
+        }
+        gameEngine = GameEngine(newMoverList, newShipList, gameEngine.removedIds, gameEngine.scores)
 //        elements.forEach {
 //            val (key, element) = it
 //            when(key) {
@@ -154,12 +163,22 @@ class TimeListener(private val elements: Map<String, ElementModel>,
 
 class CollisionListener() : EventListener<Collision> {
     override fun handle(event: Collision) {
-        println("${event.element1Id} ${event.element2Id}")
+
+
+        when {
+            event.element1Id.startsWith("Ship") && event.element2Id.startsWith("Ship") -> {
+                gameEngine = gameEngine.damageShips(event.element1Id, event.element2Id, 10)
+            }
+
+        }
+
+
+
     }
 
 }
 
-class KeyPressedListener(private val ships: List<ShipController>, private val entityInserter: EntityInserter): EventListener<KeyPressed> {
+class KeyPressedListener(private val ships: List<ShipController>, private val entityInSceneManager: EntityInSceneManager): EventListener<KeyPressed> {
 
     var keyBindingMap = insertBindings()
 
@@ -220,4 +239,16 @@ class KeyPressedListener(private val ships: List<ShipController>, private val en
 
     }
 
+}
+
+class OutOfBoundsListener() : EventListener<OutOfBounds> {
+    override fun handle(event: OutOfBounds) {
+        println("Element has gone out of bounds: ${event.id}")
+    }
+}
+
+class ReachBoundsListener() : EventListener<ReachBounds> {
+    override fun handle(event: ReachBounds) {
+        println("Element has reach bounds: ${event.id}")
+    }
 }

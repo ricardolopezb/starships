@@ -6,6 +6,11 @@
             "skin": "BASIC",
             "health": 500,
             "weaponType": "EXPLOSIVE"
+        },
+        {
+            "skin": "BASIC",
+            "health": 20,
+            "weaponType": "EXPLOSIVE"
         }
 
     ]
