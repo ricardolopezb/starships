@@ -23,7 +23,7 @@ public class LinearBulletSpawner extends AbstractSpawner implements MultipleSpaw
     @Override
     public List<Mover<Bullet>> spawnMultiple(List<Bullet> entities) {
         int quantity = entities.size();
-        int separation = 5; // number that serves as parameter, can be modified
+        int separation = 15; // number that serves as parameter, can be modified
         Integer deltaX = 2;
         Integer deltaY = 2;
         Position separationPos = new Position(deltaX, deltaY);

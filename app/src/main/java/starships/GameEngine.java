@@ -5,6 +5,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import starships.entities.Ship;
+import starships.entities.bullet.Bullet;
 import starships.entities.weapon.Weapon;
 import starships.entities.weapon.WeaponFactory;
 import starships.entities.weapon.WeaponType;
@@ -58,6 +59,18 @@ public class GameEngine {
                 return new GameEngine(this.movingEntities, newList, scores);
             }
 
+        }
+        return this;
+    }
+
+    public GameEngine shoot(String shipId){
+        for (ShipController ship : ships){
+            if(ship.getId().equals(shipId)){
+                List<Mover<Bullet>> shotBullets = ship.shoot();
+                List<Mover> newMovers = new ArrayList<>(this.movingEntities);
+                newMovers.addAll(shotBullets);
+                return new GameEngine(newMovers, this.ships, this.scores);
+            }
         }
         return this;
     }

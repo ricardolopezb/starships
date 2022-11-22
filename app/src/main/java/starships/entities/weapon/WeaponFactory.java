@@ -13,7 +13,7 @@ public class WeaponFactory {
                     BulletType.LASER,
                     ShotType.LINEAR,
                     2,
-                    0.6,
+                    2.0,
                     mover
             );
 
