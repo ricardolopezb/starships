@@ -5,5 +5,12 @@
         "rotate_clockwise": "D",
         "rotate_counterclockwise": "A",
         "shoot": "SPACE"
+    },
+    {
+        "accelerate": "U",
+        "brake": "I",
+        "rotate_clockwise": "O",
+        "rotate_counterclockwise": "P",
+        "shoot": "L"
     }
 ]

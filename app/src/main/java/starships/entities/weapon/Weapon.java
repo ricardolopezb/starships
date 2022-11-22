@@ -4,10 +4,9 @@ import starships.entities.Ship;
 import starships.entities.bullet.BulletFactory;
 import starships.entities.bullet.BulletType;
 import starships.entities.spawners.MultipleSpawner;
-import starships.entities.spawners.MultipleSpawnerFactory;
+import starships.entities.spawners.MultipleBulletSpawnerFactory;
 import starships.movement.Mover;
 import starships.entities.bullet.Bullet;
-import starships.physics.Position;
 
 import java.util.List;
 
@@ -26,7 +25,7 @@ public class Weapon {
         this.bulletFactory = new BulletFactory(bulletType);
         this.weaponType = weaponType;
         this.shotType = shotType;
-        final MultipleSpawnerFactory<Bullet> factory = new MultipleSpawnerFactory<>();
+        final MultipleBulletSpawnerFactory factory = new MultipleBulletSpawnerFactory();
         this.multipleSpawner = factory.getSpawnerForShotType(shotType, mover, shotSpeed);
         this.bulletsPerShot = bulletsPerShot;
     }
@@ -35,13 +34,13 @@ public class Weapon {
         this.bulletFactory = new BulletFactory(dto.bulletType());
         this.weaponType = dto.weaponType();
         this.shotType = dto.shotType();
-        final MultipleSpawnerFactory<Bullet> factory = new MultipleSpawnerFactory<>();
+        final MultipleBulletSpawnerFactory factory = new MultipleBulletSpawnerFactory();
         this.multipleSpawner = factory.getSpawnerForShotType(shotType, mover, dto.shotSpeed());
         this.bulletsPerShot = dto.bulletsPerShot();
     }
 
-    public List<Mover<Bullet>> shoot(){
-        List<Bullet> bullets = bulletFactory.generateBullets(bulletsPerShot);
+    public List<Mover<Bullet>> shoot(String ownerId){
+        List<Bullet> bullets = bulletFactory.generateBullets(bulletsPerShot, ownerId);
         return multipleSpawner.spawnMultiple(bullets);
     }
 

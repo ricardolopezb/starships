@@ -50,7 +50,7 @@ public class ShipController {
     }
 
     public List<Mover<Bullet>> shoot(){
-        return weapon.shoot();
+        return this.weapon.shoot(this.shipMover.getId());
     }
 
     public Optional<ShipController> takeDamage(Integer damage){
