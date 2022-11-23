@@ -10,7 +10,7 @@ import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import starships.GameEngine
-import starships.ShipController
+import starships.entities.ship.ShipController
 import starships.entities.BaseEntity
 import starships.movement.Mover
 import java.io.FileReader
@@ -163,17 +163,7 @@ class TimeListener(private val elements: Map<String, ElementModel>,
 
 class CollisionListener() : EventListener<Collision> {
     override fun handle(event: Collision) {
-
-
-        when {
-            event.element1Id.startsWith("Ship") && event.element2Id.startsWith("Ship") -> {
-                gameEngine = gameEngine.damageShips(event.element1Id, event.element2Id, 10)
-            }
-
-        }
-
-
-
+        gameEngine = gameEngine.handleCollision(event.element1Id, event.element2Id)
     }
 
 }
@@ -211,24 +201,23 @@ class KeyPressedListener(private val ships: List<ShipController>, private val en
         val pressedKey = event.key
 
         ships.forEach {
-            for ((shipId, keyCodeList) in keyBindingMap.entries.iterator()) {
+            for ((shipId, keyCodeMap) in keyBindingMap.entries.iterator()) {
                 if(shipId.equals(it.id)){
                     when(pressedKey){
-                        keyCodeList["accelerate"] -> {
+                        keyCodeMap["accelerate"] -> {
                             gameEngine = gameEngine.accelerateShip(shipId, 0.5)
                         }
-                        keyCodeList["brake"] -> {
+                        keyCodeMap["brake"] -> {
                             gameEngine = gameEngine.accelerateShip(shipId, -0.4)
                         }
-                        keyCodeList["rotate_clockwise"] -> {
+                        keyCodeMap["rotate_clockwise"] -> {
                             gameEngine = gameEngine.rotateShip(shipId, 20)
                         }
-                        keyCodeList["rotate_counterclockwise"] -> {
+                        keyCodeMap["rotate_counterclockwise"] -> {
                             gameEngine = gameEngine.rotateShip(shipId, -20)
                         }
-                        keyCodeList["shoot"] -> {
+                        keyCodeMap["shoot"] -> {
                             gameEngine = gameEngine.shoot(shipId)
-                            //entityInserter.insert(emptyList())
                         }
                         else -> {}
                     }

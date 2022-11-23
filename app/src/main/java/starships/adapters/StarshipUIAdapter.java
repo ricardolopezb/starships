@@ -3,7 +3,7 @@ package starships.adapters;
 import edu.austral.ingsis.starships.ui.ElementColliderType;
 import edu.austral.ingsis.starships.ui.ElementModel;
 import edu.austral.ingsis.starships.ui.ImageRef;
-import starships.entities.Ship;
+import starships.entities.ship.Ship;
 import starships.movement.Mover;
 
 public class StarshipUIAdapter implements CoreEntityToUIElementAdapter<Ship> {

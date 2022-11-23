@@ -1,6 +1,6 @@
 package starships.entities.weapon;
 
-import starships.entities.Ship;
+import starships.entities.ship.Ship;
 import starships.entities.bullet.BulletType;
 import starships.movement.Mover;
 

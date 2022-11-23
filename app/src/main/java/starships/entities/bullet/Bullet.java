@@ -27,4 +27,8 @@ public class Bullet extends BaseEntity {
     public BulletType getType() {
         return type;
     }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
 }

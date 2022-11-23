@@ -1,8 +1,7 @@
 package starships.movement;
 
 import edu.austral.ingsis.starships.ui.ElementModel;
-import starships.adapters.StarshipUIAdapter;
-import starships.entities.Ship;
+import starships.entities.ship.Ship;
 import starships.physics.Position;
 import starships.physics.Vector;
 

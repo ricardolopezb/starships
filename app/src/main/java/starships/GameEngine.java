@@ -2,10 +2,12 @@ package starships;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.parser.ParseException;
-import starships.entities.Ship;
+import starships.entities.ship.Ship;
 import starships.entities.bullet.Bullet;
+import starships.entities.ship.ShipController;
 import starships.movement.Mover;
 import starships.persistence.ShipsInitializer;
+import starships.physics.collision.CollisionHandler;
 
 import java.io.IOException;
 import java.util.*;
@@ -15,13 +17,16 @@ public class GameEngine {
     private final List<Mover> movingEntities;
     private final List<ShipController> ships;
     private final List<String> removedIds;
-    private final Map<Ship, Integer> scores;
+    private final Map<ShipController, Integer> scores;
+    private final CollisionHandler collisionHandler;
 
-    public GameEngine(List<Mover> movingEntities, List<ShipController> ships, List<String> removedIds,Map<Ship, Integer> scores) {
+
+    public GameEngine(List<Mover> movingEntities, List<ShipController> ships, List<String> removedIds,Map<ShipController, Integer> scores) {
         this.movingEntities = movingEntities;
         this.ships = ships;
         this.scores = scores;
         this.removedIds = removedIds;
+        this.collisionHandler = new CollisionHandler();
     }
 
     public GameEngine(){
@@ -29,6 +34,7 @@ public class GameEngine {
         this.ships = new ArrayList<>();
         this.scores = new HashMap<>();
         this.removedIds = new ArrayList<>();
+        this.collisionHandler = new CollisionHandler();
     }
 
     public GameEngine accelerateShip(String shipId, Double coef) {
@@ -54,36 +60,11 @@ public class GameEngine {
         }
     }
 
-    public GameEngine damageShips(String ship1Id, String ship2Id, Integer damage){
-        Optional<ShipController> ship1 = findShip(ship1Id);
-        Optional<ShipController> ship2 = findShip(ship2Id);
-        List<ShipController> newShipList = new ArrayList<>(this.ships);
-        List<String> newRemovedIds = new ArrayList<>(removedIds);
-        System.out.println("Collided!");
-        System.out.println("ship1 = " + ship1Id + " ship2 health= " +ship2.get().getShipMover().getMover().getEntity().getHealth());
-
-        if(ship1.isPresent() && ship2.isPresent()){
-            Optional<ShipController> damagedShip1 = ship1.get().takeDamage(damage);
-            Optional<ShipController> damagedShip2 = ship2.get().takeDamage(damage);
-
-            if(damagedShip1.isPresent()) newShipList = replaceShip(newShipList, ship1.get(), damagedShip1.get());
-            else {
-                newRemovedIds = pureAddString(newRemovedIds, ship1.get().getId());
-                newRemovedIds.add(ship1.get().getId());
-            }
-
-            if(damagedShip2.isPresent()) newShipList = replaceShip(newShipList, ship2.get(), damagedShip2.get());
-            else {
-                newShipList = removeShip(newShipList, ship2.get());
-                newRemovedIds = pureAddString(newRemovedIds, ship2.get().getId());
-                System.out.println("ship2 exploded");
-            }
-
-        }
-
-        return new GameEngine(this.movingEntities, newShipList, newRemovedIds, this.scores);
-
+    public GameEngine handleCollision(String element1Id, String element2Id){
+        return collisionHandler.handleCollision(this, element1Id, element2Id);
     }
+
+
 
     public List<String> pureAddString(List<String> list, String elem){
         List<String> newList = new ArrayList<>(list);
@@ -91,7 +72,7 @@ public class GameEngine {
         return list;
     }
 
-    private List<ShipController> removeShip(List<ShipController> list, ShipController shipController){
+    public List<ShipController> removeShip(List<ShipController> list, ShipController shipController){
         List<ShipController> listCopy = new ArrayList<>(list);
         listCopy.remove(shipController);
         return listCopy;
@@ -109,7 +90,7 @@ public class GameEngine {
         }
     }
 
-    private Optional<ShipController> findShip(String shipId){
+    public Optional<ShipController> findShip(String shipId){
         for (ShipController ship : ships) {
             if(ship.getId().equals(shipId)) return Optional.of(ship);
         }
@@ -117,10 +98,10 @@ public class GameEngine {
     }
 
     @NotNull
-    private List<ShipController> replaceShip(List<ShipController> list, ShipController ship, ShipController acceleratedShip) {
+    public List<ShipController> replaceShip(List<ShipController> list, ShipController ship, ShipController updatedShip) {
         List<ShipController> newList = new ArrayList<>(list);
         newList.remove(ship);
-        newList.add(acceleratedShip);
+        newList.add(updatedShip);
         return newList;
     }
 
@@ -128,7 +109,7 @@ public class GameEngine {
     public GameEngine initialize() throws IOException, ParseException {
         ShipsInitializer shipsInitializer = new ShipsInitializer();
         List<Mover> movers = new ArrayList<>();
-        Map<Ship, Integer> shipScores = new HashMap<>();
+        Map<ShipController, Integer> shipScores = new HashMap<>();
         List<ShipController> shipControllers = shipsInitializer.createShipControllers();
         return new GameEngine(movers, shipControllers, this.removedIds, shipScores);
     }
@@ -141,11 +122,24 @@ public class GameEngine {
         return ships;
     }
 
-    public Map<Ship, Integer> getScores() {
+    public Map<ShipController, Integer> getScores() {
         return scores;
     }
 
     public List<String> getRemovedIds() {
         return removedIds;
+    }
+
+    public Optional<Mover> findMover(String bulletId) {
+        for (Mover mover : movingEntities) {
+            if(mover.getId().equals(bulletId)) return Optional.of(mover);
+        }
+        return Optional.empty();
+    }
+
+    public List<Mover> removeMovingEntity(List<Mover> list, Mover entity) {
+        List<Mover> listCopy = new ArrayList<>(list);
+        listCopy.remove(entity);
+        return listCopy;
     }
 }

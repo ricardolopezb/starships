@@ -1,9 +1,6 @@
-package starships;
+package starships.entities.ship;
 
 import edu.austral.ingsis.starships.ui.ElementModel;
-import starships.adapters.CoreEntityToUIElementAdapter;
-import starships.adapters.StarshipUIAdapter;
-import starships.entities.Ship;
 import starships.entities.bullet.Bullet;
 import starships.entities.weapon.Weapon;
 import starships.entities.weapon.WeaponDTO;

@@ -1,6 +1,6 @@
 package starships.entities.weapon;
 
-import starships.entities.Ship;
+import starships.entities.ship.Ship;
 import starships.entities.bullet.BulletFactory;
 import starships.entities.bullet.BulletType;
 import starships.entities.spawners.MultipleSpawner;

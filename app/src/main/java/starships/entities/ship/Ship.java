@@ -1,8 +1,10 @@
-package starships.entities;
+package starships.entities.ship;
+
+import starships.entities.BaseEntity;
 
 import java.util.Optional;
 
-public class Ship extends BaseEntity{
+public class Ship extends BaseEntity {
     private final String skin;
     private final Integer health;
 
