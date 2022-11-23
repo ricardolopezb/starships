@@ -1,4 +1,4 @@
-package starships.entities.spawners;
+package starships.movement.spawners;
 
 import starships.entities.ship.Ship;
 import starships.entities.bullet.Bullet;

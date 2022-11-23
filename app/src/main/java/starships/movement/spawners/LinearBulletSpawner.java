@@ -1,7 +1,6 @@
-package starships.entities.spawners;
+package starships.movement.spawners;
 
 import starships.adapters.BulletUIAdapter;
-import starships.entities.BaseEntity;
 import starships.entities.bullet.Bullet;
 import starships.movement.Mover;
 import starships.physics.Position;
@@ -19,13 +18,12 @@ public class LinearBulletSpawner extends AbstractSpawner implements MultipleSpaw
         this.facingDirection = facingDirection;
     }
 
-    // TODO see how to get facingDirection to shoot to front
     @Override
     public List<Mover<Bullet>> spawnMultiple(List<Bullet> entities) {
         int quantity = entities.size();
         int separation = 15; // number that serves as parameter, can be modified
-        Integer deltaX = 2;
-        Integer deltaY = 2;
+        Integer deltaX = 0;
+        Integer deltaY = -9;
         Position separationPos = new Position(deltaX, deltaY);
         List<Mover<Bullet>> movers = new ArrayList<>(quantity);
 

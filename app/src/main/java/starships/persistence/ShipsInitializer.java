@@ -22,10 +22,11 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ShipsInitializer {
+    private final String INITIAL_CONFIG_FILE_PATH = System.getProperty("user.dir") +
+            "/app/src/main/java/starships/persistence/initial_config_file.json";
 
     public List<ShipController> createShipControllers() throws IOException, ParseException {
-        Object obj = new JSONParser().parse(new FileReader(System.getProperty("user.dir") +
-                "/app/src/main/java/starships/persistence/config_file_test.json"));
+        Object obj = new JSONParser().parse(new FileReader(INITIAL_CONFIG_FILE_PATH));
         JSONObject initialConfigJson = (JSONObject) obj;
         List<ShipController> shipControllers = new ArrayList<>();
         JSONArray listOfShips = (JSONArray) initialConfigJson.get("ships");

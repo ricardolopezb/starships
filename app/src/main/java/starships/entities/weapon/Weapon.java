@@ -3,8 +3,8 @@ package starships.entities.weapon;
 import starships.entities.ship.Ship;
 import starships.entities.bullet.BulletFactory;
 import starships.entities.bullet.BulletType;
-import starships.entities.spawners.MultipleSpawner;
-import starships.entities.spawners.MultipleBulletSpawnerFactory;
+import starships.movement.spawners.MultipleSpawner;
+import starships.movement.spawners.MultipleBulletSpawnerFactory;
 import starships.movement.Mover;
 import starships.entities.bullet.Bullet;
 

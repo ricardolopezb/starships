@@ -6,12 +6,12 @@
             "skin": "BASIC",
             "health": 500,
             "weaponType": "LASER"
-        },
-        {
-            "skin": "BASIC",
-            "health": 500,
-            "weaponType": "EXPLOSIVE"
         }
 
-    ]
+    ],
+
+    "window": {
+        "height": 800,
+        "width": 950
+    }
 }

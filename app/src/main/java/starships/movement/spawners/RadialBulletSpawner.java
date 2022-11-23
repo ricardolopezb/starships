@@ -1,4 +1,4 @@
-package starships.entities.spawners;
+package starships.movement.spawners;
 
 import starships.adapters.BulletUIAdapter;
 import starships.entities.bullet.Bullet;

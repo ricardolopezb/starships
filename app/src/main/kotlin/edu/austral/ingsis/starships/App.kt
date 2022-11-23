@@ -13,6 +13,7 @@ import starships.GameEngine
 import starships.entities.ship.ShipController
 import starships.entities.BaseEntity
 import starships.movement.Mover
+import starships.persistence.WindowConfigurator
 import java.io.FileReader
 
 fun main() {
@@ -31,6 +32,7 @@ class Starships() : Application() {
 
     override fun start(primaryStage: Stage) {
         gameEngine = GameEngine().initialize()
+        val windowConfigurator = WindowConfigurator()
         insertCoreEntitiesIntoUI()
         val entityInSceneManager = EntityInSceneManager(facade)
 //        val bullet =  ElementModel(
@@ -68,8 +70,8 @@ class Starships() : Application() {
         keyTracker.scene = scene
 
         primaryStage.scene = scene
-        primaryStage.height = 800.0
-        primaryStage.width = 800.0
+        primaryStage.height = (windowConfigurator.getProperty("height") as Long).toDouble()
+        primaryStage.width = (windowConfigurator.getProperty("width") as Long).toDouble()
 
         facade.start()
         keyTracker.start()
@@ -229,6 +231,8 @@ class KeyPressedListener(private val ships: List<ShipController>, private val en
     }
 
 }
+
+
 
 class OutOfBoundsListener() : EventListener<OutOfBounds> {
     override fun handle(event: OutOfBounds) {

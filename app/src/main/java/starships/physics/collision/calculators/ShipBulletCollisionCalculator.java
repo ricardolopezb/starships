@@ -19,9 +19,6 @@ public class ShipBulletCollisionCalculator implements CollisionCalculator{
 
     @Override
     public GameEngine handleCollision(GameEngine currentState, String shipId, String bulletId) {
-        System.out.println("Ship id = " + shipId + " bullet-id = " + bulletId);
-
-
         Optional<ShipController> ship = currentState.findShip(shipId);
         Optional<Mover> bulletMover = currentState.findMover(bulletId);
         List<String> newRemovedIds = new ArrayList<>(currentState.getRemovedIds());

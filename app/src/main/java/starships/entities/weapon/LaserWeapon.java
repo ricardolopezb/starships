@@ -2,7 +2,7 @@
 //
 //import starships.entities.bullet.Bullet;
 //import starships.entities.bullet.LaserBullet;
-//import starships.entities.spawners.MultipleSpawner;
+//import starships.movement.spawners.MultipleSpawner;
 //import starships.entities.spawners.MultipleSpawnerFactory;
 //import starships.movement.Mover;
 //import starships.physics.Position;

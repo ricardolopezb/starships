@@ -1,4 +1,4 @@
-package starships.entities.spawners;
+package starships.movement.spawners;
 
 import starships.entities.BaseEntity;
 import starships.movement.Mover;
