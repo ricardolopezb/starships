@@ -9,7 +9,7 @@
         },
         {
             "skin": "BASIC",
-            "health": 20,
+            "health": 500,
             "weaponType": "EXPLOSIVE"
         }
 
