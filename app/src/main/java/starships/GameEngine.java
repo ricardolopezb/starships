@@ -6,8 +6,11 @@ import starships.entities.ship.Ship;
 import starships.entities.bullet.Bullet;
 import starships.entities.ship.ShipController;
 import starships.movement.Mover;
+import starships.movement.spawners.AsteroidSpawner;
 import starships.persistence.ShipsInitializer;
+import starships.physics.Position;
 import starships.physics.collision.CollisionHandler;
+import starships.utils.RandomNumberGenerator;
 
 import java.io.IOException;
 import java.util.*;
@@ -19,6 +22,7 @@ public class GameEngine {
     private final List<String> removedIds;
     private final Map<ShipController, Integer> scores;
     private final CollisionHandler collisionHandler;
+    private final AsteroidSpawner asteroidSpawner;
 
 
     public GameEngine(List<Mover> movingEntities, List<ShipController> ships, List<String> removedIds,Map<ShipController, Integer> scores) {
@@ -27,6 +31,7 @@ public class GameEngine {
         this.scores = scores;
         this.removedIds = removedIds;
         this.collisionHandler = new CollisionHandler();
+        this.asteroidSpawner = new AsteroidSpawner();
     }
 
     public GameEngine(){
@@ -35,6 +40,7 @@ public class GameEngine {
         this.scores = new HashMap<>();
         this.removedIds = new ArrayList<>();
         this.collisionHandler = new CollisionHandler();
+        this.asteroidSpawner = new AsteroidSpawner();
     }
 
     public GameEngine accelerateShip(String shipId, Double coef) {
@@ -65,6 +71,14 @@ public class GameEngine {
     }
 
 
+    public GameEngine spawnAsteroid(){
+        Integer targetShipIndex = RandomNumberGenerator.getRandomNumber(0, ships.size());
+        Position targetShipPosition = ships.get(targetShipIndex).getShipMover().getPosition();
+        Mover asteroidMover = asteroidSpawner.spawnAsteroid(targetShipPosition);
+        List<Mover> newMoverList = new ArrayList<>(this.movingEntities);
+        newMoverList.add(asteroidMover);
+        return new GameEngine(newMoverList, this.ships, this.removedIds, this.scores);
+    }
 
     public List<String> pureAddString(List<String> list, String elem){
         List<String> newList = new ArrayList<>(list);

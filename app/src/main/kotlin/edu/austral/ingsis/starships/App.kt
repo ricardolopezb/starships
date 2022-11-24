@@ -103,6 +103,7 @@ class EntityInSceneManager(private val facade: ElementsViewFacade){
     }
 
     fun insert(entity: ElementModel){
+        println("Inserting " + entity.id)
         facade.elements[entity.id] = entity
     }
 
@@ -114,6 +115,7 @@ class EntityInSceneManager(private val facade: ElementsViewFacade){
 
 class TimeListener(private val elements: Map<String, ElementModel>,
                    private val inserter: EntityInSceneManager) : EventListener<TimePassed> {
+    var prevMillis: Long = 0
     override fun handle(event: TimePassed) {
         val newShipList = ArrayList<ShipController>()
         val newMoverList = ArrayList<Mover<BaseEntity>>()
@@ -144,22 +146,13 @@ class TimeListener(private val elements: Map<String, ElementModel>,
             }
         }
         gameEngine = GameEngine(newMoverList, newShipList, gameEngine.removedIds, gameEngine.scores)
-//        elements.forEach {
-//            val (key, element) = it
-//            when(key) {
-//                "starship" -> {element= gameEngine.ships[0].update().adapt()}
-//                "asteroid-1" -> {
-//                    element.x.set(element.x.value + 0.25)
-//                    element.y.set(element.y.value + 0.25)
-//                }
-//                else -> {
-//                    element.x.set(element.x.value - 0.25)
-//                    element.y.set(element.y.value - 0.25)
-//                }
-//            }
+
+        if(System.currentTimeMillis() - prevMillis >= 5000){
+            prevMillis = System.currentTimeMillis()
+            gameEngine = gameEngine.spawnAsteroid()
+        }
 
         //element.rotationInDegrees.set(element.rotationInDegrees.value + 1)
-    //}
     }
 }
 
@@ -225,14 +218,10 @@ class KeyPressedListener(private val ships: List<ShipController>, private val en
                     }
                 }
             }
-
         }
-
     }
 
 }
-
-
 
 class OutOfBoundsListener() : EventListener<OutOfBounds> {
     override fun handle(event: OutOfBounds) {
