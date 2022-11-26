@@ -46,7 +46,7 @@ public class AsteroidSpawner {
                 new Asteroid("Asteroid-" + IdGenerator.generateId(), getRandomNumber(20, 600)),
                 new Position(x, y),
                 getMovementVectorToShipPostition(x, y, targetShipPosition),
-                new Vector(0.0,0.0),
+                new Vector(1.0,1.0),
                 new AsteroidUIAdapter()
         );
     }
@@ -55,7 +55,8 @@ public class AsteroidSpawner {
     private Vector getMovementVectorToShipPostition(Integer x, Integer y, Position targetShipPosition) {
         //System.out.println("Target ship postition " + targetShipPosition.getX() + " " + targetShipPosition.getY());
         //System.out.println((double) (targetShipPosition.getX() - x)+ " " + (double) (targetShipPosition.getY() - y));
-        return new Vector((double) (targetShipPosition.getX() - x)*0.01, (double) (targetShipPosition.getY() - y)*0.01);
+        //return new Vector((double) (targetShipPosition.getX() - x)*0.01, (double) (targetShipPosition.getY() - y)*0.01);
+        return new Vector(0.0, -1.0);
     }
 
 

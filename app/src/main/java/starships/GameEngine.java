@@ -2,6 +2,7 @@ package starships;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.parser.ParseException;
+import starships.entities.Asteroid;
 import starships.entities.ship.Ship;
 import starships.entities.bullet.Bullet;
 import starships.entities.ship.ShipController;
@@ -71,13 +72,13 @@ public class GameEngine {
     }
 
 
-    public GameEngine spawnAsteroid(){
+    public Mover<Asteroid> spawnAsteroid(){
         Integer targetShipIndex = RandomNumberGenerator.getRandomNumber(0, ships.size());
         Position targetShipPosition = ships.get(targetShipIndex).getShipMover().getPosition();
-        Mover asteroidMover = asteroidSpawner.spawnAsteroid(targetShipPosition);
-        List<Mover> newMoverList = new ArrayList<>(this.movingEntities);
-        newMoverList.add(asteroidMover);
-        return new GameEngine(newMoverList, this.ships, this.removedIds, this.scores);
+        return asteroidSpawner.spawnAsteroid(targetShipPosition);
+//        List<Mover> newMoverList = new ArrayList<>(this.movingEntities);
+//        newMoverList.add(asteroidMover);
+//        return new GameEngine(newMoverList, this.ships, this.removedIds, this.scores);
     }
 
     public List<String> pureAddString(List<String> list, String elem){

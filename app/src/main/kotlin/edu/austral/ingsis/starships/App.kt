@@ -3,6 +3,7 @@ package edu.austral.ingsis.starships
 import edu.austral.ingsis.starships.ui.*
 import javafx.application.Application
 import javafx.application.Application.launch
+import javafx.collections.ObservableMap
 import javafx.scene.Scene
 import javafx.scene.input.KeyCode
 import javafx.stage.Stage
@@ -14,6 +15,7 @@ import starships.entities.ship.ShipController
 import starships.entities.BaseEntity
 import starships.movement.Mover
 import starships.persistence.WindowConfigurator
+import starships.utils.RandomNumberGenerator
 import java.io.FileReader
 
 fun main() {
@@ -105,6 +107,7 @@ class EntityInSceneManager(private val facade: ElementsViewFacade){
     fun insert(entity: ElementModel){
         println("Inserting " + entity.id)
         facade.elements[entity.id] = entity
+        println(facade.elements)
     }
 
     fun removeById(entityId: String){
@@ -113,12 +116,60 @@ class EntityInSceneManager(private val facade: ElementsViewFacade){
 
 }
 
-class TimeListener(private val elements: Map<String, ElementModel>,
+class TimeListener(private val elements: ObservableMap<String, ElementModel>,
                    private val inserter: EntityInSceneManager) : EventListener<TimePassed> {
-    var prevMillis: Long = 0
+    private var prevMillis: Long = 0
     override fun handle(event: TimePassed) {
+        val probability = RandomNumberGenerator.getRandomNumber(0, 10000)*0.01
         val newShipList = ArrayList<ShipController>()
         val newMoverList = ArrayList<Mover<BaseEntity>>()
+
+        updateShips(newShipList)
+        removeIdsInScene()
+        spawnAsteroid(probability, newMoverList)
+        updateMovingEntities(newMoverList)
+
+
+        gameEngine = GameEngine(newMoverList, newShipList, gameEngine.removedIds, gameEngine.scores)
+
+        //element.rotationInDegrees.set(element.rotationInDegrees.value + 1)
+    }
+
+    private fun updateMovingEntities(newMoverList: ArrayList<Mover<BaseEntity>>) {
+        gameEngine.movingEntities.forEach {
+            val updatedMover = it.updatePosition()
+            val updatedMoverElementModel = updatedMover.adapt()
+
+            if (elements.containsKey(it.id)) {
+                elements[it.id]?.x?.set(updatedMoverElementModel.x.value)
+                elements[it.id]?.y?.set(updatedMoverElementModel.y.value)
+                elements[it.id]?.rotationInDegrees?.set(updatedMoverElementModel.rotationInDegrees.value)
+            } else {
+                //inserter.insert(updatedMoverElementModel)
+                elements[updatedMoverElementModel.id] = updatedMoverElementModel
+            }
+            newMoverList.add(updatedMover)
+        }
+    }
+
+    private fun spawnAsteroid(probability: Double, newMoverList: ArrayList<Mover<BaseEntity>>) {
+        if (Math.random() <= 0.001) {
+            //prevMillis = currentMillis
+            val asteroidMover = gameEngine.spawnAsteroid()
+            newMoverList.add(asteroidMover as Mover<BaseEntity>)
+    //            newMoverList = (gameEngine.movingEntities as ArrayList<Mover<BaseEntity>>)
+        }
+    }
+
+    private fun removeIdsInScene() {
+        gameEngine.removedIds.forEach {
+            if (elements.containsKey(it)) {
+                inserter.removeById(it)
+            }
+        }
+    }
+
+    private fun updateShips(newShipList: ArrayList<ShipController>) {
         gameEngine.ships.forEach {
             val updatedShip = it.update()
             val updatedShipElementModel = updatedShip.adapt()
@@ -127,32 +178,6 @@ class TimeListener(private val elements: Map<String, ElementModel>,
             elements[it.id]?.rotationInDegrees?.set(updatedShipElementModel.rotationInDegrees.value)
             newShipList.add(updatedShip)
         }
-        gameEngine.movingEntities.forEach {
-            val updatedMover = it.updatePosition()
-            val updatedMoverElementModel = updatedMover.adapt()
-
-            if(elements[it.id] != null) {
-                elements[it.id]?.x?.set(updatedMoverElementModel.x.value)
-                elements[it.id]?.y?.set(updatedMoverElementModel.y.value)
-                elements[it.id]?.rotationInDegrees?.set(updatedMoverElementModel.rotationInDegrees.value)
-            } else {
-                inserter.insert(updatedMoverElementModel)
-            }
-            newMoverList.add(updatedMover)
-        }
-        gameEngine.removedIds.forEach{
-            if(elements.containsKey(it)){
-                inserter.removeById(it)
-            }
-        }
-        gameEngine = GameEngine(newMoverList, newShipList, gameEngine.removedIds, gameEngine.scores)
-
-        if(System.currentTimeMillis() - prevMillis >= 5000){
-            prevMillis = System.currentTimeMillis()
-            gameEngine = gameEngine.spawnAsteroid()
-        }
-
-        //element.rotationInDegrees.set(element.rotationInDegrees.value + 1)
     }
 }
 
