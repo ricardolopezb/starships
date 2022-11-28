@@ -14,7 +14,8 @@ import starships.GameState
 import starships.entities.ship.ShipController
 import starships.entities.BaseEntity
 import starships.movement.Mover
-import starships.persistence.WindowConfigurator
+import persistence.Constants
+import persistence.WindowConfigurator
 import starships.utils.RandomNumberGenerator
 import java.io.FileReader
 
@@ -57,27 +58,36 @@ class Starships() : Application() {
 
 //        val starship = ElementModel("starship", 300.0, 300.0, 40.0, 40.0, 270.0, Triangular, STARSHIP_IMAGE_REF)
 
-        facade.timeListenable.addEventListener(TimeListener(facade.elements, entityInSceneManager))
-        facade.collisionsListenable.addEventListener(CollisionListener())
-        facade.outOfBoundsListenable.addEventListener(OutOfBoundsListener())
-        facade.reachBoundsListenable.addEventListener(ReachBoundsListener())
-//        val ship = gameEngine.ships[0].adapt()
+        addEventListeners(entityInSceneManager)
+
+        //        val ship = gameEngine.ships[0].adapt()
 //        val ships = facade.elements.filter { (key, _) -> key.startsWith("Ship") }
 ////        val keyPressedListener = KeyPressedListener(ships)
 //        keyPressedListener.insertBindings()
 //        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(ships, facade.elements))
-        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(gameState.ships, entityInSceneManager))
 
         val scene = Scene(facade.view)
         keyTracker.scene = scene
 
-        primaryStage.scene = scene
-        primaryStage.height = (windowConfigurator.getProperty("height").get() as Long).toDouble()
-        primaryStage.width = (windowConfigurator.getProperty("width").get() as Long).toDouble()
+        setUpPrimaryStage(primaryStage, scene, windowConfigurator)
 
         facade.start()
         keyTracker.start()
         primaryStage.show()
+    }
+
+    private fun setUpPrimaryStage(primaryStage: Stage, scene: Scene, windowConfigurator: WindowConfigurator) {
+        primaryStage.scene = scene
+        primaryStage.height = (windowConfigurator.getProperty("height").get() as Long).toDouble()
+        primaryStage.width = (windowConfigurator.getProperty("width").get() as Long).toDouble()
+    }
+
+    private fun addEventListeners(entityInSceneManager: EntityInSceneManager) {
+        facade.timeListenable.addEventListener(TimeListener(facade.elements, entityInSceneManager))
+        facade.collisionsListenable.addEventListener(CollisionListener())
+        facade.outOfBoundsListenable.addEventListener(OutOfBoundsListener())
+        facade.reachBoundsListenable.addEventListener(ReachBoundsListener())
+        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(gameState.ships, entityInSceneManager))
     }
 
     fun insertCoreEntitiesIntoUI() {
@@ -152,7 +162,7 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
     }
 
     private fun spawnAsteroid(probability: Double, newMoverList: ArrayList<Mover<BaseEntity>>) {
-        if (Math.random() <= 0.001) {
+        if (Math.random() <= Constants.ASTEROID_SPAWN_RATE) {
             //prevMillis = currentMillis
             val asteroidMover = gameState.spawnAsteroid()
             newMoverList.add(asteroidMover as Mover<BaseEntity>)
@@ -181,7 +191,6 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
 
 class CollisionListener() : EventListener<Collision> {
     override fun handle(event: Collision) {
-        println("colliding")
         gameState = gameState.handleCollision(event.element1Id, event.element2Id)
     }
 
@@ -193,8 +202,7 @@ class KeyPressedListener(private val ships: List<ShipController>, private val en
 
     fun insertBindings(): Map<String, Map<String, KeyCode>>{
         val mapToReturn = HashMap<String, Map<String, KeyCode>>()
-        val obj = JSONParser().parse(FileReader(System.getProperty("user.dir") +
-                "/app/src/main/java/starships/persistence/keybindings.json"))
+        val obj = JSONParser().parse(FileReader(Constants.KEYBINDINGS_FILE_PATH))
         val keyBindings = obj as JSONArray
         val it: Iterator<*> = keyBindings.iterator()
         var id = 1
@@ -224,16 +232,16 @@ class KeyPressedListener(private val ships: List<ShipController>, private val en
                 if(shipId.equals(it.id)){
                     when(pressedKey){
                         keyCodeMap["accelerate"] -> {
-                            gameState = gameState.accelerateShip(shipId, 0.5)
+                            gameState = gameState.accelerateShip(shipId, Constants.SHIP_ACCELERATION_COEFFICIENT)
                         }
                         keyCodeMap["brake"] -> {
-                            gameState = gameState.accelerateShip(shipId, -0.4)
+                            gameState = gameState.accelerateShip(shipId, Constants.SHIP_BRAKE_COEFFICIENT)
                         }
                         keyCodeMap["rotate_clockwise"] -> {
-                            gameState = gameState.rotateShip(shipId, 20)
+                            gameState = gameState.rotateShip(shipId, Constants.SHIP_ROTATION_DEGREES)
                         }
                         keyCodeMap["rotate_counterclockwise"] -> {
-                            gameState = gameState.rotateShip(shipId, -20)
+                            gameState = gameState.rotateShip(shipId, -Constants.SHIP_ROTATION_DEGREES)
                         }
                         keyCodeMap["shoot"] -> {
                             gameState = gameState.shoot(shipId)

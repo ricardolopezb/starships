@@ -1,4 +1,4 @@
-package starships.adapters;
+package adapters;
 
 import edu.austral.ingsis.starships.ui.ElementModel;
 import starships.entities.BaseEntity;

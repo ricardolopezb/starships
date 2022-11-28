@@ -1,11 +1,11 @@
-package starships.persistence;
+package persistence;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import starships.entities.ship.ShipController;
-import starships.adapters.StarshipUIAdapter;
+import adapters.StarshipUIAdapter;
 import starships.entities.ship.Ship;
 import starships.entities.weapon.Weapon;
 import starships.entities.weapon.WeaponFactory;
@@ -22,11 +22,10 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ShipsInitializer {
-    private final String INITIAL_CONFIG_FILE_PATH = System.getProperty("user.dir") +
-            "/app/src/main/java/starships/persistence/initial_config_file.json";
+
 
     public List<ShipController> createShipControllers() throws IOException, ParseException {
-        Object obj = new JSONParser().parse(new FileReader(INITIAL_CONFIG_FILE_PATH));
+        Object obj = new JSONParser().parse(new FileReader(Constants.INITIAL_CONFIG_FILE_PATH));
         JSONObject initialConfigJson = (JSONObject) obj;
         List<ShipController> shipControllers = new ArrayList<>();
         JSONArray listOfShips = (JSONArray) initialConfigJson.get("ships");

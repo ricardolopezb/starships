@@ -9,13 +9,12 @@ import starships.entities.ship.ShipController;
 import starships.movement.Mover;
 import starships.movement.ShipMover;
 import starships.movement.spawners.AsteroidSpawner;
-import starships.persistence.ShipsInitializer;
+import persistence.ShipsInitializer;
 import starships.physics.Position;
 import starships.utils.RandomNumberGenerator;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class GameState {
 

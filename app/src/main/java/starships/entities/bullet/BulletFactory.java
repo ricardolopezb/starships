@@ -1,5 +1,6 @@
 package starships.entities.bullet;
 
+import persistence.Constants;
 import starships.utils.IdGenerator;
 
 import java.util.ArrayList;
@@ -23,9 +24,9 @@ public class BulletFactory {
 
     private Bullet createBulletForType(String ownerId) {
         switch (this.bulletType) {
-            case LASER -> {return new Bullet("Bullet-"+ IdGenerator.generateId(), BulletType.LASER, 20, 2, ownerId);}
+            case LASER -> {return new Bullet("Bullet-"+ IdGenerator.generateId(), BulletType.LASER, Constants.LASER_BULLET_DAMAGE, 2, ownerId);}
             //case PLASMA -> {return new Bullet("Bullet-"+ IdGenerator.generateId(), BulletType.PLASMA, 14, 2, ownerId);}
-            case EXPLOSIVE -> {return new Bullet("Bullet-"+ IdGenerator.generateId(), BulletType.EXPLOSIVE, 15, 4, ownerId);}
+            case EXPLOSIVE -> {return new Bullet("Bullet-"+ IdGenerator.generateId(), BulletType.EXPLOSIVE, Constants.EXPLOSIVE_BULLET_DAMAGE, 4, ownerId);}
             default -> {return null;}
         }
     }

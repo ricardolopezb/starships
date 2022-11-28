@@ -1,9 +1,8 @@
 package starships.movement;
 
 import edu.austral.ingsis.starships.ui.ElementModel;
-import starships.adapters.CoreEntityToUIElementAdapter;
+import adapters.CoreEntityToUIElementAdapter;
 import starships.entities.BaseEntity;
-import starships.entities.weapon.Collidable;
 import starships.physics.Position;
 import starships.physics.Vector;
 

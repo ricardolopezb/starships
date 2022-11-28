@@ -1,8 +1,8 @@
 package starships.entities.ship;
 
 import starships.entities.BaseEntity;
-import starships.entities.weapon.Collidable;
-import starships.persistence.Constants;
+import starships.entities.Collidable;
+import persistence.Constants;
 
 import java.util.Optional;
 

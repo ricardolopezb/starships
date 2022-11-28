@@ -1,11 +1,11 @@
 package starships.movement.spawners;
 
 import org.jetbrains.annotations.NotNull;
-import starships.adapters.AsteroidUIAdapter;
+import adapters.AsteroidUIAdapter;
 import starships.entities.Asteroid;
 import starships.movement.Mover;
-import starships.persistence.Constants;
-import starships.persistence.WindowConfigurator;
+import persistence.Constants;
+import persistence.WindowConfigurator;
 import starships.physics.Position;
 import starships.physics.Vector;
 import starships.utils.IdGenerator;

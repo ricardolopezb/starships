@@ -1,10 +1,9 @@
-package starships.adapters;
+package adapters;
 
 import edu.austral.ingsis.starships.ui.ElementColliderType;
 import edu.austral.ingsis.starships.ui.ElementModel;
 import edu.austral.ingsis.starships.ui.ImageRef;
 import starships.entities.Asteroid;
-import starships.entities.BaseEntity;
 import starships.movement.Mover;
 
 public class AsteroidUIAdapter implements CoreEntityToUIElementAdapter<Asteroid>{

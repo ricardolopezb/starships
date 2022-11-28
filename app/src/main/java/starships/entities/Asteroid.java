@@ -1,7 +1,5 @@
 package starships.entities;
 
-import starships.entities.weapon.Collidable;
-
 import java.util.Optional;
 
 public class Asteroid extends BaseEntity{

@@ -1,7 +1,7 @@
 package starships.entities.bullet;
 
 import starships.entities.BaseEntity;
-import starships.entities.weapon.Collidable;
+import starships.entities.Collidable;
 
 import java.util.Optional;
 

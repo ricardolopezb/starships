@@ -3,6 +3,7 @@ package starships.entities.weapon;
 import starships.entities.ship.Ship;
 import starships.entities.bullet.BulletType;
 import starships.movement.Mover;
+import persistence.Constants;
 
 public class WeaponFactory {
 
@@ -12,8 +13,8 @@ public class WeaponFactory {
                     WeaponType.LASER,
                     BulletType.LASER,
                     ShotType.LINEAR,
-                    2,
-                    2.0,
+                    Constants.LASER_WEAPON_BULLETS_PER_SHOT,
+                    Constants.LASER_WEAPON_SHOT_SPEED,
                     mover
             );
 
@@ -21,8 +22,8 @@ public class WeaponFactory {
                     WeaponType.EXPLOSIVE,
                     BulletType.EXPLOSIVE,
                     ShotType.RADIAL,
-                    4,
-                    2.0,
+                    Constants.EXPLOSIVE_WEAPON_BULLETS_PER_SHOT,
+                    Constants.EXPLOSIVE_WEAPON_SHOT_SPEED,
                     mover
             );
 

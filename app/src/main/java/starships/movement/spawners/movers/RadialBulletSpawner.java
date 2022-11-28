@@ -1,6 +1,6 @@
 package starships.movement.spawners.movers;
 
-import starships.adapters.BulletUIAdapter;
+import adapters.BulletUIAdapter;
 import starships.entities.bullet.Bullet;
 import starships.movement.Mover;
 import starships.physics.Position;
