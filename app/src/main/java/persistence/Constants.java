@@ -19,13 +19,13 @@ public class Constants {
     public static final Double EXPLOSIVE_WEAPON_SHOT_SPEED = 2.0;
 
 
-    public static final Double ASTEROID_SPEED = 1.2;
+    public static final Double ASTEROID_SPEED = 1.1; //1.2
     public static final Double SHIP_ACCELERATION_COEFFICIENT = 0.5;
     public static final Double SHIP_BRAKE_COEFFICIENT = -0.4;
     public static final Integer SHIP_ROTATION_DEGREES = 20;
 
 
-    public static final Double ASTEROID_SPAWN_RATE = 0.001;
+    public static final Double ASTEROID_SPAWN_RATE = 0.001; //0.001
 
     public static final String KEYBINDINGS_FILE_PATH = System.getProperty("user.dir") +
             "/app/src/main/java/persistence/keybindings.json";

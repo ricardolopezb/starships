@@ -9,12 +9,13 @@ import starships.movement.Mover;
 public class AsteroidUIAdapter implements CoreEntityToUIElementAdapter<Asteroid>{
     @Override
     public ElementModel adapt(Mover<Asteroid> mover) {
+        Integer size = mover.getEntity().getSize();
         return new ElementModel(
                 mover.getId(),
                 mover.getPosition().getX(),
                 mover.getPosition().getY(),
-                70,
-                70,
+                size,
+                size,
                 mover.getFacingDirection().getDegrees(),
                 ElementColliderType.Elliptical,
                 new ImageRef("asteroid", 70, 70)

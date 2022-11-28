@@ -130,6 +130,7 @@ public class GameState {
         Map<String, Integer> newScores = new HashMap<>(this.scores);
         newScores = addScoreToMover(newScores, element1.getEntity().getScore());
         newScores = addScoreToMover(newScores, element2.getEntity().getScore());
+        System.out.println(newScores);
         return newScores;
 
     }
@@ -235,9 +236,6 @@ public class GameState {
         Integer targetShipIndex = RandomNumberGenerator.getRandomNumber(0, ships.size());
         Position targetShipPosition = ships.get(targetShipIndex).getShipMover().getPosition();
         return asteroidSpawner.spawnAsteroid(targetShipPosition);
-//        List<Mover> newMoverList = new ArrayList<>(this.movingEntities);
-//        newMoverList.add(asteroidMover);
-//        return new GameEngine(newMoverList, this.ships, this.removedIds, this.scores);
     }
 
     public List<String> pureAddString(List<String> list, String elem){

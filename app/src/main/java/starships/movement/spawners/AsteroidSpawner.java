@@ -45,9 +45,9 @@ public class AsteroidSpawner {
 
 
     private Mover<Asteroid> spawnInCoordinates(Integer x, Integer y, Position targetShipPosition) {
-        //getRandomNumber(20, 600)
+        Integer randomSize = getRandomNumber(50, 100);
         return new Mover<>(
-                new Asteroid("Asteroid-" + IdGenerator.generateId(), 20),
+                new Asteroid("Asteroid-" + IdGenerator.generateId(), randomSize),
                 new Position(x, y),
                 getMovementVectorToShipPostition(x, y, targetShipPosition),
                 new Vector(1.0,1.0),
@@ -58,8 +58,6 @@ public class AsteroidSpawner {
     @NotNull
     private Vector getMovementVectorToShipPostition(Integer x, Integer y, Position targetShipPosition) {
         return generateMovementVector(x, y, targetShipPosition);
-
-        //return new Vector(0.0, -1.0);
     }
 
     private static Vector generateMovementVector(Integer x, Integer y, Position targetShipPosition) {
