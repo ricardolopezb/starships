@@ -90,11 +90,24 @@ public class GameState {
     public GameState handleOutOfBounds(String elementId){
         List<Mover> moverList = new ArrayList<>(this.movingEntities);
         List<String> newRemovedIds = new ArrayList<>(this.removedIds);
+        List<ShipController> newShips = new ArrayList<>(this.ships);
         if(!elementId.startsWith("Ship")){
             moverList = getMoversCopyWithMoverRemoved(elementId);
             newRemovedIds.add(elementId);
+        } else {
+            newShips = resetShipPosition(elementId, newShips);
         }
-        return new GameState(moverList, this.ships, newRemovedIds, this.scores);
+        return new GameState(moverList, newShips, newRemovedIds, this.scores);
+    }
+
+    private List<ShipController> resetShipPosition(String elementId, List<ShipController> newShips) {
+        Optional<ShipController> originalShip = findShip(elementId);
+        if(originalShip.isPresent()){
+            ShipController resetShip = originalShip.get().resetPosition();
+            newShips = replaceShip(this.ships, originalShip.get(), resetShip);
+
+        }
+        return newShips;
     }
 
     public GameState changeWeapon(String shipId){

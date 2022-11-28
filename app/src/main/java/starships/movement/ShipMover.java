@@ -2,6 +2,7 @@ package starships.movement;
 
 import edu.austral.ingsis.starships.ui.ElementModel;
 import adapters.CoreEntityToUIElementAdapter;
+import persistence.Constants;
 import starships.entities.ship.Ship;
 import starships.physics.Position;
 import starships.physics.Vector;
@@ -67,5 +68,10 @@ public class ShipMover {
 
     public CoreEntityToUIElementAdapter getAdapter() {
         return this.mover.getAdapter();
+    }
+
+    public ShipMover resetPosition() {
+        Mover<Ship> newMover = new Mover<>(mover.getEntity(), new Position(Constants.STARTING_X_COORD, Constants.STARTING_Y_COORD), new Vector(0.0, 0.0), mover.getFacingDirection(), mover.getAdapter());
+        return new ShipMover(newMover);
     }
 }

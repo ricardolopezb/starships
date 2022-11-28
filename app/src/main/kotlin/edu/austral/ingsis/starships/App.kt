@@ -87,7 +87,7 @@ class Starships() : Application() {
         facade.collisionsListenable.addEventListener(CollisionListener())
         facade.outOfBoundsListenable.addEventListener(OutOfBoundsListener())
         facade.reachBoundsListenable.addEventListener(ReachBoundsListener())
-        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(gameState.ships, entityInSceneManager))
+        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener())
     }
 
     fun insertCoreEntitiesIntoUI() {
@@ -106,13 +106,6 @@ class Starships() : Application() {
 }
 
 class EntityInSceneManager(private val facade: ElementsViewFacade){
-
-    fun insert(entities: List<ElementModel>) {
-//        for (entity in entities.iterator()){
-//            facade.elements[entity.id] = entity
-//        }
-        println("shooting!")
-    }
 
     fun insert(entity: ElementModel){
         println("Inserting " + entity.id)
@@ -195,15 +188,13 @@ class CollisionListener() : EventListener<Collision> {
 
 }
 
-class KeyPressedListener(private val ships: List<ShipController>, private val entityInSceneManager: EntityInSceneManager): EventListener<KeyPressed> {
+class KeyPressedListener(): EventListener<KeyPressed> {
 
     var keyBindingMap = insertBindings()
 
     fun insertBindings(): Map<String, Map<String, KeyCode>>{
         val mapToReturn = HashMap<String, Map<String, KeyCode>>()
-        val obj = JSONParser().parse(FileReader(Constants.KEYBINDINGS_FILE_PATH))
-        val keyBindings = obj as JSONArray
-        val it: Iterator<*> = keyBindings.iterator()
+        val it: Iterator<*> = getKeybindingsMapIterator()
         var id = 1
         while (it.hasNext()) {
             val binding = it.next() as JSONObject
@@ -223,35 +214,25 @@ class KeyPressedListener(private val ships: List<ShipController>, private val en
         return mapToReturn
     }
 
+    private fun getKeybindingsMapIterator(): Iterator<*> {
+        val obj = JSONParser().parse(FileReader(Constants.KEYBINDINGS_FILE_PATH))
+        val keyBindings = obj as JSONArray
+        val it: Iterator<*> = keyBindings.iterator()
+        return it
+    }
+
     override fun handle(event: KeyPressed) {
         val pressedKey = event.key
+        for ((shipId, keyCodeMap) in keyBindingMap.entries.iterator()) {
 
-        ships.forEach {
-            for ((shipId, keyCodeMap) in keyBindingMap.entries.iterator()) {
-                if(shipId.equals(it.id)){
-                    when(pressedKey){
-                        keyCodeMap["accelerate"] -> {
-                            gameState = gameState.accelerateShip(shipId, Constants.SHIP_ACCELERATION_COEFFICIENT)
-                        }
-                        keyCodeMap["brake"] -> {
-                            //gameState = gameState.accelerateShip(shipId, Constants.SHIP_BRAKE_COEFFICIENT)
-                            gameState = gameState.stopShip(shipId)
-                        }
-                        keyCodeMap["rotate_clockwise"] -> {
-                            gameState = gameState.rotateShip(shipId, Constants.SHIP_ROTATION_DEGREES)
-                        }
-                        keyCodeMap["rotate_counterclockwise"] -> {
-                            gameState = gameState.rotateShip(shipId, -Constants.SHIP_ROTATION_DEGREES)
-                        }
-                        keyCodeMap["shoot"] -> {
-                            gameState = gameState.shoot(shipId)
-                        }
-                        keyCodeMap["change_weapon"] -> {
-                            gameState = gameState.changeWeapon(shipId)
-                        }
-                        else -> {}
-                    }
-                }
+            when(pressedKey){
+                keyCodeMap["accelerate"] -> gameState = gameState.accelerateShip(shipId, Constants.SHIP_ACCELERATION_COEFFICIENT)
+                keyCodeMap["brake"] -> gameState = gameState.stopShip(shipId)
+                keyCodeMap["rotate_clockwise"] -> gameState = gameState.rotateShip(shipId, Constants.SHIP_ROTATION_DEGREES)
+                keyCodeMap["rotate_counterclockwise"] -> gameState = gameState.rotateShip(shipId, -Constants.SHIP_ROTATION_DEGREES)
+                keyCodeMap["shoot"] -> gameState = gameState.shoot(shipId)
+                keyCodeMap["change_weapon"] -> gameState = gameState.changeWeapon(shipId)
+                else -> {}
             }
         }
     }

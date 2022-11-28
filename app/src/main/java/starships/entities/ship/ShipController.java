@@ -57,26 +57,7 @@ public class ShipController {
         return this.weapon.shoot(this.shipMover.getId());
     }
 
-    public Optional<ShipController> takeDamage(Integer damage){
-        Optional<Ship> newShip = this.shipMover.getMover().getEntity().takeDamage(damage);
-        if(newShip.isEmpty()) return Optional.empty();
-        else{
 
-            return Optional.of(new ShipController(
-                    new ShipMover(
-                            new Mover<>(
-                                    newShip.get(),
-                                    this.shipMover.getPosition(),
-                                    this.shipMover.getMovementVector(),
-                                    this.shipMover.getFacingDirection(),
-                                    this.shipMover.getMover().getAdapter()
-                            )
-                    ),
-                    weapon)
-            );
-
-        }
-    }
 
     public ShipMover getShipMover() {
         return shipMover;
@@ -88,5 +69,9 @@ public class ShipController {
 
     public ShipController stop() {
         return new ShipController(this.shipMover.stopShip(), this.weapon);
+    }
+
+    public ShipController resetPosition(){
+        return new ShipController(this.shipMover.resetPosition(), this.weapon);
     }
 }

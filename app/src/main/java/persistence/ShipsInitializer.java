@@ -24,6 +24,7 @@ import java.util.List;
 public class ShipsInitializer {
 
 
+
     public List<ShipController> createShipControllers() throws IOException, ParseException {
         Object obj = new JSONParser().parse(new FileReader(Constants.INITIAL_CONFIG_FILE_PATH));
         JSONObject initialConfigJson = (JSONObject) obj;
@@ -31,19 +32,21 @@ public class ShipsInitializer {
         JSONArray listOfShips = (JSONArray) initialConfigJson.get("ships");
         Iterator it = listOfShips.iterator();
         Integer idNumber = 1;
+        Integer offset = 0;
         while(it.hasNext()){
-            shipControllers.add(createShipController((JSONObject) it.next(), idNumber));
+            shipControllers.add(createShipController((JSONObject) it.next(), idNumber, offset));
             idNumber++;
+            offset += Constants.SHIP_SPAWN_POSITION_OFFSET;
         }
         return shipControllers;
     }
 
-    private ShipController createShipController(JSONObject initialConfigJson, Integer shipIdNumber) {
+    private ShipController createShipController(JSONObject initialConfigJson, Integer shipIdNumber, Integer offset) {
         String shipSkin = (String) initialConfigJson.get("skin");
         Integer shipHealth = ((Long) initialConfigJson.get("health")).intValue();
         String weaponType = (String) initialConfigJson.get("weaponType");
 
-        ShipMover shipMover = createShipMover(shipSkin, shipHealth, shipIdNumber);
+        ShipMover shipMover = createShipMover(shipSkin, shipHealth, shipIdNumber, offset);
         Weapon weapon = WeaponFactory.createWeaponForType(WeaponType.valueOf(weaponType), shipMover.getMover());
 
         return new ShipController(shipMover, weapon);
@@ -51,10 +54,10 @@ public class ShipsInitializer {
 
     }
 
-    private static ShipMover createShipMover(String shipSkin, Integer shipHealth, Integer shipIdNumber) {
+    private static ShipMover createShipMover(String shipSkin, Integer shipHealth, Integer shipIdNumber, Integer offset) {
         Mover<Ship> mover = new Mover<>(
                 new Ship("Ship-"+shipIdNumber, shipHealth, shipSkin),
-                new Position(300, 300),
+                new Position(Constants.STARTING_X_COORD+offset, Constants.STARTING_Y_COORD),
                 new Vector(0D,0D),
                 new Vector(0D),
                 new StarshipUIAdapter()

@@ -34,5 +34,7 @@ public class Constants {
             "/app/src/main/java/persistence/initial_config_file.json";
 
 
-
+    public static final Integer SHIP_SPAWN_POSITION_OFFSET = 70;
+    public static final Integer STARTING_X_COORD = 300;
+    public static final Integer STARTING_Y_COORD = 300;
 }
