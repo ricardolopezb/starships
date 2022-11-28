@@ -6,6 +6,7 @@ import starships.entities.Asteroid;
 import starships.entities.BaseEntity;
 import starships.entities.bullet.Bullet;
 import starships.entities.ship.ShipController;
+import starships.entities.weapon.WeaponType;
 import starships.movement.Mover;
 import starships.movement.ShipMover;
 import starships.movement.spawners.AsteroidSpawner;
@@ -78,6 +79,22 @@ public class GameState {
         insertCollidedElementsInLists(shipsCopy, moversCopy, removedIdsCopy, element1, element2, collidedElement1, collidedElement2);
         return new GameState(moversCopy, shipsCopy, removedIdsCopy, newScores);
 
+    }
+
+    public GameState changeWeapon(String shipId){
+        Optional<ShipController> foundShip = findShip(shipId);
+        if(foundShip.isPresent()){
+            WeaponType nextWeapon = getNextWeapon(foundShip.get().getWeapon().getWeaponType());
+            ShipController changedWeaponShip = foundShip.get().changeWeapon(nextWeapon);
+            List<ShipController> newList = replaceShip(this.ships, foundShip.get(), changedWeaponShip);
+            return new GameState(this.movingEntities, newList, this.removedIds, scores);
+        } else {
+            return this;
+        }
+    }
+
+    private WeaponType getNextWeapon(WeaponType weaponType) {
+        return weaponType == WeaponType.LASER ? WeaponType.EXPLOSIVE : WeaponType.LASER;
     }
 
     private Map<String, Integer> addScore(Mover element1, Mover element2) {
@@ -213,7 +230,7 @@ public class GameState {
         }
     }
 
-    public Optional<ShipController> findShip(String shipId){
+    private Optional<ShipController> findShip(String shipId){
         for (ShipController ship : ships) {
             if(ship.getId().equals(shipId)) return Optional.of(ship);
         }
@@ -221,7 +238,7 @@ public class GameState {
     }
 
     @NotNull
-    public List<ShipController> replaceShip(List<ShipController> list, ShipController ship, ShipController updatedShip) {
+    private List<ShipController> replaceShip(List<ShipController> list, ShipController ship, ShipController updatedShip) {
         List<ShipController> newList = new ArrayList<>(list);
         newList.remove(ship);
         newList.add(updatedShip);
@@ -261,7 +278,7 @@ public class GameState {
         return removedIds;
     }
 
-    public Optional<Mover> findMover(String moverId) {
+    private Optional<Mover> findMover(String moverId) {
         for (Mover mover : movingEntities) {
             if(mover.getId().equals(moverId)) return Optional.of(mover);
         }

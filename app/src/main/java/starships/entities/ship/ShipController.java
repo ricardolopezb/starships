@@ -4,6 +4,8 @@ import edu.austral.ingsis.starships.ui.ElementModel;
 import starships.entities.bullet.Bullet;
 import starships.entities.weapon.Weapon;
 import starships.entities.weapon.WeaponDTO;
+import starships.entities.weapon.WeaponFactory;
+import starships.entities.weapon.WeaponType;
 import starships.movement.Mover;
 import starships.movement.ShipMover;
 
@@ -30,8 +32,12 @@ public class ShipController {
 
     }
 
-    public ShipController changeWeapon(WeaponDTO weaponDTO){
-        return new ShipController(this.shipMover, new Weapon(weaponDTO, this.shipMover.getMover()));
+    public ShipController changeWeapon(WeaponType weaponType){
+        return new ShipController(this.shipMover, WeaponFactory.createWeaponForType(weaponType, this.shipMover.getMover()));
+
+
+
+        //return new ShipController(this.shipMover, new Weapon(weaponDTO, this.shipMover.getMover()));
     }
 
     public ShipController accelerate(Double coefficient){

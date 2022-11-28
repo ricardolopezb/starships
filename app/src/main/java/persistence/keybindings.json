@@ -4,13 +4,15 @@
         "brake": "S",
         "rotate_clockwise": "D",
         "rotate_counterclockwise": "A",
-        "shoot": "SPACE"
+        "shoot": "SPACE",
+        "change_weapon": "R"
     },
     {
         "accelerate": "UP",
         "brake": "DOWN",
         "rotate_clockwise": "RIGHT",
         "rotate_counterclockwise": "LEFT",
-        "shoot": "L"
+        "shoot": "L",
+        "change_weapon": "P"
     }
 ]

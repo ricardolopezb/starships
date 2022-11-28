@@ -4,13 +4,8 @@
     "ships": [
         {
             "skin": "BASIC",
-            "health": 100,
-            "weaponType": "LASER"
-        },
-        {
-            "skin": "BASIC",
-            "health": 100,
-            "weaponType": "LASER"
+            "health": 10,
+            "weaponType": "EXPLOSIVE"
         }
 
     ],

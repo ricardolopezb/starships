@@ -27,7 +27,8 @@ public class Bullet extends BaseEntity {
 
     @Override
     public Optional collide(Collidable other) {
-        if(((BaseEntity) other).getId().equals(ownerId)) return Optional.of(this);
+        if(((BaseEntity) other).getId().equals(ownerId) || ((BaseEntity) other).getEntityType() == EntityType.BULLET)
+            return Optional.of(this);
         return this.takeDamage(other.getDamage());
     }
 

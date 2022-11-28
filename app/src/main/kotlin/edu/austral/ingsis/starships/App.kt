@@ -212,8 +212,8 @@ class KeyPressedListener(private val ships: List<ShipController>, private val en
                     "brake" to KeyCode.valueOf(binding.get("brake") as String),
                     "rotate_clockwise" to KeyCode.valueOf(binding.get("rotate_clockwise") as String),
                     "rotate_counterclockwise" to KeyCode.valueOf(binding.get("rotate_counterclockwise") as String),
-                    "shoot" to KeyCode.valueOf(binding.get("shoot") as String)
-
+                    "shoot" to KeyCode.valueOf(binding.get("shoot") as String),
+                    "change_weapon" to KeyCode.valueOf(binding.get("change_weapon") as String)
             )
 
             mapToReturn["Ship-"+id] = bindingMap
@@ -245,6 +245,9 @@ class KeyPressedListener(private val ships: List<ShipController>, private val en
                         }
                         keyCodeMap["shoot"] -> {
                             gameState = gameState.shoot(shipId)
+                        }
+                        keyCodeMap["change_weapon"] -> {
+                            gameState = gameState.changeWeapon(shipId)
                         }
                         else -> {}
                     }
