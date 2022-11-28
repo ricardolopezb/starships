@@ -25,7 +25,7 @@ public class Constants {
     public static final Integer SHIP_ROTATION_DEGREES = 20;
 
 
-    public static final Double ASTEROID_SPAWN_RATE = 0.001; //0.001
+    public static final Double ASTEROID_SPAWN_RATE = 0.003; //0.001
 
     public static final String KEYBINDINGS_FILE_PATH = System.getProperty("user.dir") +
             "/app/src/main/java/persistence/keybindings.json";

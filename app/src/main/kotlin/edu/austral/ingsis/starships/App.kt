@@ -38,33 +38,7 @@ class Starships() : Application() {
         val windowConfigurator = WindowConfigurator()
         insertCoreEntitiesIntoUI()
         val entityInSceneManager = EntityInSceneManager(facade)
-//        val bullet =  ElementModel(
-//                "lmao",
-//                350.0,
-//                350.0,
-//                10.0,
-//                10.0,
-//                180.0, ElementColliderType.Rectangular,
-//                ImageRef("bullet", 20.0, 20.0)
-//        )
-//        facade.elements["lmao"] = bullet
-//        facade.elements["asteroid-1"] =
-//            ElementModel("asteroid-1", 0.0, 0.0, 30.0, 40.0, 0.0, Elliptical, null)
-//        facade.elements["asteroid-2"] =
-//            ElementModel("asteroid-2", 100.0, 100.0, 30.0, 20.0, 90.0, Rectangular, null)
-//        facade.elements["asteroid-3"] =
-//            ElementModel("asteroid-3", 200.0, 200.0, 20.0, 30.0, 180.0, Elliptical, null)
-
-
-//        val starship = ElementModel("starship", 300.0, 300.0, 40.0, 40.0, 270.0, Triangular, STARSHIP_IMAGE_REF)
-
         addEventListeners(entityInSceneManager)
-
-        //        val ship = gameEngine.ships[0].adapt()
-//        val ships = facade.elements.filter { (key, _) -> key.startsWith("Ship") }
-////        val keyPressedListener = KeyPressedListener(ships)
-//        keyPressedListener.insertBindings()
-//        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(ships, facade.elements))
 
         val scene = Scene(facade.view)
         keyTracker.scene = scene
@@ -108,9 +82,9 @@ class Starships() : Application() {
 class EntityInSceneManager(private val facade: ElementsViewFacade){
 
     fun insert(entity: ElementModel){
-        println("Inserting " + entity.id)
+        //println("Inserting " + entity.id)
         facade.elements[entity.id] = entity
-        println(facade.elements)
+        //println(facade.elements)
     }
 
     fun removeById(entityId: String){
@@ -124,16 +98,14 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
     override fun handle(event: TimePassed) {
         val newShipList = ArrayList<ShipController>()
         val newMoverList = ArrayList<Mover<BaseEntity>>()
-
         updateShips(newShipList)
         removeIdsInScene()
         spawnAsteroid(newMoverList)
         updateMovingEntities(newMoverList)
 
-
         gameState = GameState(newMoverList, newShipList, gameState.removedIds, gameState.scores)
 
-        //element.rotationInDegrees.set(element.rotationInDegrees.value + 1)
+
     }
 
     private fun updateMovingEntities(newMoverList: ArrayList<Mover<BaseEntity>>) {
@@ -144,10 +116,11 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
             if (elements.containsKey(it.id)) {
                 elements[it.id]?.x?.set(updatedMoverElementModel.x.value)
                 elements[it.id]?.y?.set(updatedMoverElementModel.y.value)
-                elements[it.id]?.rotationInDegrees?.set(updatedMoverElementModel.rotationInDegrees.value)
+                if(it.id.startsWith("Asteroid"))
+                    elements[it.id]?.rotationInDegrees?.set(elements[it.id]?.rotationInDegrees!!.value + 1)
             } else {
-                //inserter.insert(updatedMoverElementModel)
-                elements[updatedMoverElementModel.id] = updatedMoverElementModel
+                inserter.insert(updatedMoverElementModel)
+                //elements[updatedMoverElementModel.id] = updatedMoverElementModel
             }
             newMoverList.add(updatedMover)
         }
