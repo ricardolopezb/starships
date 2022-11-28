@@ -27,14 +27,14 @@ class Starships() : Application() {
     private val imageResolver = CachedImageResolver(DefaultImageResolver())
     private val facade = ElementsViewFacade(imageResolver)
     private val keyTracker = KeyTracker()
-
-
-    companion object {
-        val STARSHIP_IMAGE_REF = ImageRef("starship", 70.0, 70.0)
+    companion object Paused {
+        var paused = false
     }
+
 
     override fun start(primaryStage: Stage) {
         gameState = GameState().initialize()
+
         val windowConfigurator = WindowConfigurator()
         insertCoreEntitiesIntoUI()
         val entityInSceneManager = EntityInSceneManager(facade)
@@ -57,7 +57,7 @@ class Starships() : Application() {
     }
 
     private fun addEventListeners(entityInSceneManager: EntityInSceneManager) {
-        facade.timeListenable.addEventListener(TimeListener(facade.elements, entityInSceneManager))
+        facade.timeListenable.addEventListener(TimeListener(facade.elements, entityInSceneManager, Paused))
         facade.collisionsListenable.addEventListener(CollisionListener())
         facade.outOfBoundsListenable.addEventListener(OutOfBoundsListener())
         facade.reachBoundsListenable.addEventListener(ReachBoundsListener())
@@ -82,9 +82,7 @@ class Starships() : Application() {
 class EntityInSceneManager(private val facade: ElementsViewFacade){
 
     fun insert(entity: ElementModel){
-        //println("Inserting " + entity.id)
         facade.elements[entity.id] = entity
-        //println(facade.elements)
     }
 
     fun removeById(entityId: String){
@@ -94,18 +92,31 @@ class EntityInSceneManager(private val facade: ElementsViewFacade){
 }
 
 class TimeListener(private val elements: ObservableMap<String, ElementModel>,
-                   private val inserter: EntityInSceneManager) : EventListener<TimePassed> {
+                   private val inserter: EntityInSceneManager,
+                   private var paused: Starships.Paused) : EventListener<TimePassed> {
+    private val startingShips = gameState.ships.size
     override fun handle(event: TimePassed) {
+        if (Starships.paused) return
         val newShipList = ArrayList<ShipController>()
         val newMoverList = ArrayList<Mover<BaseEntity>>()
+        if(startingShips > 1) checkMultiplayerVictory()
+        else checkGameOver()
         updateShips(newShipList)
         removeIdsInScene()
         spawnAsteroid(newMoverList)
         updateMovingEntities(newMoverList)
 
         gameState = GameState(newMoverList, newShipList, gameState.removedIds, gameState.scores)
+    }
 
+    private fun checkGameOver() {
+        if(gameState.ships.isEmpty()) println("Game Over!")
+    }
 
+    private fun checkMultiplayerVictory() {
+        if(gameState.ships.size == 1){
+            println(gameState.ships[0].id + " won!")
+        }
     }
 
     private fun updateMovingEntities(newMoverList: ArrayList<Mover<BaseEntity>>) {
@@ -128,7 +139,6 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
 
     private fun spawnAsteroid(newMoverList: ArrayList<Mover<BaseEntity>>) {
         if (Math.random() <= Constants.ASTEROID_SPAWN_RATE) {
-            //prevMillis = currentMillis
             val asteroidMover = gameState.spawnAsteroid()
             newMoverList.add(asteroidMover as Mover<BaseEntity>)
         }
@@ -177,7 +187,8 @@ class KeyPressedListener(): EventListener<KeyPressed> {
                     "rotate_clockwise" to KeyCode.valueOf(binding.get("rotate_clockwise") as String),
                     "rotate_counterclockwise" to KeyCode.valueOf(binding.get("rotate_counterclockwise") as String),
                     "shoot" to KeyCode.valueOf(binding.get("shoot") as String),
-                    "change_weapon" to KeyCode.valueOf(binding.get("change_weapon") as String)
+                    "change_weapon" to KeyCode.valueOf(binding.get("change_weapon") as String),
+                    "pause" to KeyCode.valueOf(binding.get("pause") as String)
             )
 
             mapToReturn["Ship-"+id] = bindingMap
@@ -205,6 +216,8 @@ class KeyPressedListener(): EventListener<KeyPressed> {
                 keyCodeMap["rotate_counterclockwise"] -> gameState = gameState.rotateShip(shipId, -Constants.SHIP_ROTATION_DEGREES)
                 keyCodeMap["shoot"] -> gameState = gameState.shoot(shipId)
                 keyCodeMap["change_weapon"] -> gameState = gameState.changeWeapon(shipId)
+                keyCodeMap["pause"] -> Starships.paused = !Starships.paused
+                //keyCodeMap["pause"] -> println("Lmao")
                 else -> {}
             }
         }
