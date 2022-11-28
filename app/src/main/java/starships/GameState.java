@@ -12,6 +12,7 @@ import starships.movement.spawners.AsteroidSpawner;
 import persistence.ShipsInitializer;
 import starships.physics.Position;
 import starships.utils.RandomNumberGenerator;
+import starships.utils.ScoreDTO;
 
 import java.io.IOException;
 import java.util.*;
@@ -21,11 +22,11 @@ public class GameState {
     private final List<Mover> movingEntities;
     private final List<ShipController> ships;
     private final List<String> removedIds;
-    private final Map<ShipController, Integer> scores;
+    private final Map<String, Integer> scores;
     private final AsteroidSpawner asteroidSpawner;
 
 
-    public GameState(List<Mover> movingEntities, List<ShipController> ships, List<String> removedIds, Map<ShipController, Integer> scores) {
+    public GameState(List<Mover> movingEntities, List<ShipController> ships, List<String> removedIds, Map<String, Integer> scores) {
         this.movingEntities = movingEntities;
         this.ships = ships;
         this.scores = scores;
@@ -71,15 +72,33 @@ public class GameState {
         Optional<Mover> element1 = findMoverInAllEntities(element1Id);
         Optional<Mover> element2 = findMoverInAllEntities(element2Id);
         if(element1.isEmpty() || element2.isEmpty()) return this;
-        Optional<BaseEntity> collidedElement1 = collideElements(element1, element2);
-        Optional<BaseEntity> collidedElement2 = collideElements(element2, element1);
+        Map<String, Integer> newScores = addScore(element1.get(), element2.get());
+        Optional<BaseEntity> collidedElement1 = collideElements(element1.get(), element2.get());
+        Optional<BaseEntity> collidedElement2 = collideElements(element2.get(), element1.get());
         insertCollidedElementsInLists(shipsCopy, moversCopy, removedIdsCopy, element1, element2, collidedElement1, collidedElement2);
-        return new GameState(moversCopy, shipsCopy, removedIdsCopy, this.scores);
+        return new GameState(moversCopy, shipsCopy, removedIdsCopy, newScores);
 
     }
 
-    private static Optional collideElements(Optional<Mover> element1, Optional<Mover> element2) {
-        return element1.get().getEntity().collide(element2.get().getEntity());
+    private Map<String, Integer> addScore(Mover element1, Mover element2) {
+        Map<String, Integer> newScores = new HashMap<>(this.scores);
+        newScores = addScoreToMover(newScores, element1.getEntity().getScore());
+        newScores = addScoreToMover(newScores, element2.getEntity().getScore());
+        return newScores;
+
+    }
+
+    private Map<String, Integer> addScoreToMover(Map<String, Integer> newScores, ScoreDTO score) {
+        Map<String, Integer> scoreMapToAdd = new HashMap<>(newScores);
+        if(newScores.containsKey(score.id())){
+            Integer value = newScores.get(score.id());
+            scoreMapToAdd.put(score.id(), value + score.score());
+        }
+        return scoreMapToAdd;
+    }
+
+    private static Optional collideElements(Mover element1, Mover element2) {
+        return element1.getEntity().collide(element2.getEntity());
     }
 
     private void insertCollidedElementsInLists(List<ShipController> shipsCopy, List<Mover> moversCopy, List<String> removedIdsCopy, Optional<Mover> element1, Optional<Mover> element2, Optional<BaseEntity> collidedElement1, Optional<BaseEntity> collidedElement2) {
@@ -106,11 +125,9 @@ public class GameState {
         }
 
         if(collisionResult.get().getId().startsWith("Ship")){
-            //removePreExistingShipController(collisionResult, shipsCopy);
             ShipController collidedShipController = getCollidedShipController(collisionResult);
             shipsCopy.add(collidedShipController);
         } else {
-            //aaremovePreExistingMover(collisionResult, moversCopy);
             Mover newCollidedMover = getCollidedEntityMover(collisionResult, shipsCopy, moversCopy);
             moversCopy.add(newCollidedMover);
         }
@@ -215,9 +232,17 @@ public class GameState {
     public GameState initialize() throws IOException, ParseException {
         ShipsInitializer shipsInitializer = new ShipsInitializer();
         List<Mover> movers = new ArrayList<>();
-        Map<ShipController, Integer> shipScores = new HashMap<>();
         List<ShipController> shipControllers = shipsInitializer.createShipControllers();
+        Map<String, Integer> shipScores = initializeShipScores(shipControllers);
         return new GameState(movers, shipControllers, this.removedIds, shipScores);
+    }
+
+    private Map<String, Integer> initializeShipScores(List<ShipController> shipControllers) {
+        Map<String, Integer> scoresMap = new HashMap<>();
+        for (ShipController shipController : shipControllers) {
+            scoresMap.put(shipController.getId(), 0);
+        }
+        return scoresMap;
     }
 
     public List<Mover> getMovingEntities() {
@@ -228,7 +253,7 @@ public class GameState {
         return ships;
     }
 
-    public Map<ShipController, Integer> getScores() {
+    public Map<String, Integer> getScores() {
         return scores;
     }
 

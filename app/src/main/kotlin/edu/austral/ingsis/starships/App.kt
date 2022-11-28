@@ -129,13 +129,12 @@ class EntityInSceneManager(private val facade: ElementsViewFacade){
 class TimeListener(private val elements: ObservableMap<String, ElementModel>,
                    private val inserter: EntityInSceneManager) : EventListener<TimePassed> {
     override fun handle(event: TimePassed) {
-        val probability = RandomNumberGenerator.getRandomNumber(0, 10000)*0.01
         val newShipList = ArrayList<ShipController>()
         val newMoverList = ArrayList<Mover<BaseEntity>>()
 
         updateShips(newShipList)
         removeIdsInScene()
-        spawnAsteroid(probability, newMoverList)
+        spawnAsteroid(newMoverList)
         updateMovingEntities(newMoverList)
 
 
@@ -161,7 +160,7 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
         }
     }
 
-    private fun spawnAsteroid(probability: Double, newMoverList: ArrayList<Mover<BaseEntity>>) {
+    private fun spawnAsteroid(newMoverList: ArrayList<Mover<BaseEntity>>) {
         if (Math.random() <= Constants.ASTEROID_SPAWN_RATE) {
             //prevMillis = currentMillis
             val asteroidMover = gameState.spawnAsteroid()
@@ -235,7 +234,8 @@ class KeyPressedListener(private val ships: List<ShipController>, private val en
                             gameState = gameState.accelerateShip(shipId, Constants.SHIP_ACCELERATION_COEFFICIENT)
                         }
                         keyCodeMap["brake"] -> {
-                            gameState = gameState.accelerateShip(shipId, Constants.SHIP_BRAKE_COEFFICIENT)
+                            //gameState = gameState.accelerateShip(shipId, Constants.SHIP_BRAKE_COEFFICIENT)
+                            gameState = gameState.stopShip(shipId)
                         }
                         keyCodeMap["rotate_clockwise"] -> {
                             gameState = gameState.rotateShip(shipId, Constants.SHIP_ROTATION_DEGREES)

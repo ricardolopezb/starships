@@ -2,18 +2,20 @@ package starships.entities.bullet;
 
 import starships.entities.BaseEntity;
 import starships.entities.Collidable;
+import starships.entities.EntityType;
+import starships.utils.ScoreDTO;
 
 import java.util.Optional;
 
 public class Bullet extends BaseEntity {
-    private final BulletType type;
+    private final BulletType bulletType;
     private final Integer damage;
     private final Integer size;
     private final String ownerId;
 
     public Bullet(String id, BulletType type, Integer damage, Integer size, String ownerId) {
-        super(id);
-        this.type = type;
+        super(id, EntityType.BULLET);
+        this.bulletType = type;
         this.damage = damage;
         this.size = size;
         this.ownerId = ownerId;
@@ -34,13 +36,18 @@ public class Bullet extends BaseEntity {
         return Optional.empty();
     }
 
+    @Override
+    public ScoreDTO getScore() {
+        return new ScoreDTO(this.ownerId, this.damage);
+    }
+
 
     public Integer getSize() {
         return size;
     }
 
-    public BulletType getType() {
-        return type;
+    public BulletType getBulletType() {
+        return bulletType;
     }
 
     public String getOwnerId() {

@@ -1,5 +1,7 @@
 package starships.entities;
 
+import starships.utils.ScoreDTO;
+
 import java.util.Optional;
 
 public class Asteroid extends BaseEntity{
@@ -9,13 +11,13 @@ public class Asteroid extends BaseEntity{
     private final Integer health;
 
     public Asteroid(String id, Integer size) {
-        super(id);
+        super(id, EntityType.ASTEROID);
         this.size = size;
         this.damage = size/3;
         this.health = size;
     }
     public Asteroid(String id, Integer size, Integer health){
-        super(id);
+        super(id, EntityType.ASTEROID);
         this.size = size;
         this.damage = size/3;
         this.health = health;
@@ -41,5 +43,10 @@ public class Asteroid extends BaseEntity{
     public Optional<Asteroid> takeDamage(Integer damage){
         if(damage >= this.health) return Optional.empty();
         else return Optional.of(new Asteroid(this.id, this.size, this.health-damage));
+    }
+
+    @Override
+    public ScoreDTO getScore() {
+        return new ScoreDTO(this.id, 0);
     }
 }

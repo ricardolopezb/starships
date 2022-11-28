@@ -11,7 +11,7 @@ public class BulletUIAdapter implements CoreEntityToUIElementAdapter<Bullet>{
     @Override
     public ElementModel adapt(Mover<Bullet> mover) {
 
-        BulletType type = mover.getEntity().getType();
+        BulletType type = mover.getEntity().getBulletType();
         ImageRef bulletPicture = switch (type) {
             case LASER -> new ImageRef("laser_bullet", 20, 20);
             case EXPLOSIVE -> new ImageRef("explosive_bullet", 20, 20);
