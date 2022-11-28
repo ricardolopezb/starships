@@ -6,6 +6,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Optional;
 
 public class WindowConfigurator {
     private final JSONObject properties;
@@ -25,7 +26,8 @@ public class WindowConfigurator {
         this.properties = (JSONObject) generalJSON.get("window");
     }
 
-    public Object getProperty(String property){
-        return this.properties.get(property);
+    public Optional<Object> getProperty(String property){
+        Object result = this.properties.get(property);
+        return result != null ? Optional.of(result) : Optional.empty();
     }
 }

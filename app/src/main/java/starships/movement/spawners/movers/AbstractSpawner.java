@@ -1,4 +1,4 @@
-package starships.movement.spawners;
+package starships.movement.spawners.movers;
 
 import starships.physics.Position;
 

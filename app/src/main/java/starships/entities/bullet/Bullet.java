@@ -1,6 +1,9 @@
 package starships.entities.bullet;
 
 import starships.entities.BaseEntity;
+import starships.entities.weapon.Collidable;
+
+import java.util.Optional;
 
 public class Bullet extends BaseEntity {
     private final BulletType type;
@@ -19,6 +22,18 @@ public class Bullet extends BaseEntity {
     public Integer getDamage() {
         return damage;
     }
+
+    @Override
+    public Optional collide(Collidable other) {
+        if(((BaseEntity) other).getId().equals(ownerId)) return Optional.of(this);
+        return this.takeDamage(other.getDamage());
+    }
+
+    @Override
+    public Optional takeDamage(Integer damage) {
+        return Optional.empty();
+    }
+
 
     public Integer getSize() {
         return size;

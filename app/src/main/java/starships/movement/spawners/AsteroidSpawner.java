@@ -1,18 +1,14 @@
 package starships.movement.spawners;
 
-import javafx.geometry.Pos;
 import org.jetbrains.annotations.NotNull;
 import starships.adapters.AsteroidUIAdapter;
 import starships.entities.Asteroid;
-import starships.entities.ship.Ship;
 import starships.movement.Mover;
+import starships.persistence.Constants;
 import starships.persistence.WindowConfigurator;
 import starships.physics.Position;
 import starships.physics.Vector;
 import starships.utils.IdGenerator;
-import starships.utils.RandomNumberGenerator;
-
-import java.util.Random;
 
 import static starships.utils.RandomNumberGenerator.getRandomNumber;
 
@@ -24,13 +20,20 @@ public class AsteroidSpawner {
 
     public AsteroidSpawner() {
         WindowConfigurator wc = new WindowConfigurator();
-        this.maxX = ((Long) wc.getProperty("width")).intValue();
-        this.maxY = ((Long) wc.getProperty("height")).intValue();}
+
+
+        this.maxX = getIntegerPropertyValueWithDefault(wc, "width", 950);
+        this.maxY = getIntegerPropertyValueWithDefault(wc, "height", 800);
+    }
+
+    private static int getIntegerPropertyValueWithDefault(WindowConfigurator wc, String property, int defaultValue) {
+        return wc.getProperty(property).isPresent() ? ((Long) wc.getProperty(property).get()).intValue() : defaultValue;
+    }
 
     public Mover<Asteroid> spawnAsteroid(Position targetShipPosition){
         Side randomSide = getRandomSide();
         return switch (randomSide) {
-            case TOP -> spawnInCoordinates(getRandomNumber(0, maxX), 0+10, targetShipPosition);
+            case TOP -> spawnInCoordinates(getRandomNumber(0, maxX), 0+70, targetShipPosition);
             case BOTTOM -> spawnInCoordinates(getRandomNumber(0, maxX), maxY-10, targetShipPosition);
             case LEFT -> spawnInCoordinates(0+10, getRandomNumber(0, maxY), targetShipPosition);
             case RIGHT -> spawnInCoordinates(maxX-10, getRandomNumber(0, maxY), targetShipPosition);
@@ -42,8 +45,9 @@ public class AsteroidSpawner {
 
 
     private Mover<Asteroid> spawnInCoordinates(Integer x, Integer y, Position targetShipPosition) {
+        //getRandomNumber(20, 600)
         return new Mover<>(
-                new Asteroid("Asteroid-" + IdGenerator.generateId(), getRandomNumber(20, 600)),
+                new Asteroid("Asteroid-" + IdGenerator.generateId(), 20),
                 new Position(x, y),
                 getMovementVectorToShipPostition(x, y, targetShipPosition),
                 new Vector(1.0,1.0),
@@ -53,10 +57,13 @@ public class AsteroidSpawner {
 
     @NotNull
     private Vector getMovementVectorToShipPostition(Integer x, Integer y, Position targetShipPosition) {
-        //System.out.println("Target ship postition " + targetShipPosition.getX() + " " + targetShipPosition.getY());
-        //System.out.println((double) (targetShipPosition.getX() - x)+ " " + (double) (targetShipPosition.getY() - y));
-        //return new Vector((double) (targetShipPosition.getX() - x)*0.01, (double) (targetShipPosition.getY() - y)*0.01);
-        return new Vector(0.0, -1.0);
+        return generateMovementVector(x, y, targetShipPosition);
+
+        //return new Vector(0.0, -1.0);
+    }
+
+    private static Vector generateMovementVector(Integer x, Integer y, Position targetShipPosition) {
+        return new Vector((double) (targetShipPosition.getX() - x), (double) (targetShipPosition.getY() - y)).normalize().multiply(Constants.ASTEROID_SPEED);
     }
 
 

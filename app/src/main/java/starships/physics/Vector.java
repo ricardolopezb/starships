@@ -64,4 +64,13 @@ public class Vector {
     public int hashCode() {
         return Objects.hash(x, y);
     }
+
+    public Vector normalize() {
+        final Double magnitude = calculateMagnitude();
+        return new Vector(x/magnitude, y/magnitude);
+    }
+
+    private Double calculateMagnitude(){
+        return Math.sqrt(x*x + y*y);
+    }
 }

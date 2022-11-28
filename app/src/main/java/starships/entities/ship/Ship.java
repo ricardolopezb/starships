@@ -1,6 +1,8 @@
 package starships.entities.ship;
 
 import starships.entities.BaseEntity;
+import starships.entities.weapon.Collidable;
+import starships.persistence.Constants;
 
 import java.util.Optional;
 
@@ -30,5 +32,18 @@ public class Ship extends BaseEntity {
 
     public String getId(){
         return this.id;
+    }
+
+
+    @Override
+    public Integer getDamage() {
+        return Constants.SHIP_COLLISION_DAMAGE;
+    }
+
+    @Override
+    public Optional collide(Collidable other) {
+        return this.takeDamage(other.getDamage());
+        //optionals.add(other.takeDamage((Integer) Constants.getProperty("ship-collision-damage")));
+
     }
 }

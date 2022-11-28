@@ -1,6 +1,7 @@
 package starships.movement;
 
 import edu.austral.ingsis.starships.ui.ElementModel;
+import starships.adapters.CoreEntityToUIElementAdapter;
 import starships.entities.ship.Ship;
 import starships.physics.Position;
 import starships.physics.Vector;
@@ -36,6 +37,11 @@ public class ShipMover {
         return new ShipMover(mover.updatePosition());
     }
 
+    public ShipMover stopShip(){
+        Mover<Ship> newMover = new Mover<>(mover.getEntity(), mover.getPosition(), new Vector(0.0, 0.0), mover.getFacingDirection(), mover.getAdapter());
+        return new ShipMover(newMover);
+    }
+
     public Mover<Ship> getMover() {
         return this.mover;
     }
@@ -57,5 +63,9 @@ public class ShipMover {
 
     public ElementModel adapt() {
         return this.mover.adapt();
+    }
+
+    public CoreEntityToUIElementAdapter getAdapter() {
+        return this.mover.getAdapter();
     }
 }

@@ -3,6 +3,7 @@ package starships.movement;
 import edu.austral.ingsis.starships.ui.ElementModel;
 import starships.adapters.CoreEntityToUIElementAdapter;
 import starships.entities.BaseEntity;
+import starships.entities.weapon.Collidable;
 import starships.physics.Position;
 import starships.physics.Vector;
 
@@ -23,7 +24,7 @@ public class Mover<T extends BaseEntity> {
 
     public Mover<T> updatePosition(){
         Position newPosition = new Position((int)(this.position.getX()+this.movementVector.getX()), (int)(this.position.getY()+this.movementVector.getY()));
-        System.out.println(this.entity.getId() +" new pos: x = " + newPosition.getX() + " y = " + newPosition.getY());
+        //System.out.println(this.entity.getId() +" new pos: x = " + newPosition.getX() + " y = " + newPosition.getY());
         return new Mover<>(this.entity, newPosition, this.movementVector, this.facingDirection, this.adapter);
     }
 
