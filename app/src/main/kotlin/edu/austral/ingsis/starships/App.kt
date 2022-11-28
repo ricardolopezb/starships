@@ -260,12 +260,12 @@ class KeyPressedListener(private val ships: List<ShipController>, private val en
 
 class OutOfBoundsListener() : EventListener<OutOfBounds> {
     override fun handle(event: OutOfBounds) {
-        println("Element has gone out of bounds: ${event.id}")
+        gameState = gameState.handleOutOfBounds(event.id)
     }
 }
 
 class ReachBoundsListener() : EventListener<ReachBounds> {
     override fun handle(event: ReachBounds) {
-        println("Element has reach bounds: ${event.id}")
+        gameState = gameState.handleReachBounds(event.id)
     }
 }

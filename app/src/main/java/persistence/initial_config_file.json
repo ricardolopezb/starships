@@ -5,7 +5,7 @@
         {
             "skin": "BASIC",
             "health": 10,
-            "weaponType": "EXPLOSIVE"
+            "weaponType": "LASER"
         }
 
     ],

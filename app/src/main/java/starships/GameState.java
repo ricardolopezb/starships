@@ -81,6 +81,22 @@ public class GameState {
 
     }
 
+    public GameState handleReachBounds(String elementId){
+        if(elementId.startsWith("Ship"))
+            return stopShip(elementId);
+        else return this;
+    }
+
+    public GameState handleOutOfBounds(String elementId){
+        List<Mover> moverList = new ArrayList<>(this.movingEntities);
+        List<String> newRemovedIds = new ArrayList<>(this.removedIds);
+        if(!elementId.startsWith("Ship")){
+            moverList = getMoversCopyWithMoverRemoved(elementId);
+            newRemovedIds.add(elementId);
+        }
+        return new GameState(moverList, this.ships, newRemovedIds, this.scores);
+    }
+
     public GameState changeWeapon(String shipId){
         Optional<ShipController> foundShip = findShip(shipId);
         if(foundShip.isPresent()){
@@ -124,12 +140,17 @@ public class GameState {
     }
 
     @NotNull
-    private ArrayList<Mover> getMoversCopyWithMoverRemoved(String element1Id, String element2Id) {
+    private List<Mover> getMoversCopyWithMoverRemoved(String element1Id, String element2Id) {
         return new ArrayList<>(this.movingEntities.stream().filter(mover -> !mover.getId().equals(element1Id) && !mover.getId().equals(element2Id)).toList());
     }
+    @NotNull
+    private List<Mover> getMoversCopyWithMoverRemoved(String element1Id) {
+        return new ArrayList<>(this.movingEntities.stream().filter(mover -> !mover.getId().equals(element1Id)).toList());
+    }
+
 
     @NotNull
-    private ArrayList<ShipController> getShipsCopyWithShipRemoved(String element1Id, String element2Id) {
+    private List<ShipController> getShipsCopyWithShipRemoved(String element1Id, String element2Id) {
         return new ArrayList<>(this.ships.stream().filter(shipController -> !shipController.getId().equals(element1Id) && !shipController.getId().equals(element2Id)).toList());
     }
 
