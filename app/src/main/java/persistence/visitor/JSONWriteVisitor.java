@@ -49,7 +49,7 @@ public class JSONWriteVisitor implements Visitor<JSONObject> {
         obj.put("size", bullet.getSize());
         obj.put("damage", bullet.getDamage());
         obj.put("ownerId", bullet.getOwnerId());
-        obj.put("bullet-type", bullet.getBulletType());
+        obj.put("bullet-type", bullet.getBulletType().name());
         return obj;
     }
 
@@ -66,20 +66,10 @@ public class JSONWriteVisitor implements Visitor<JSONObject> {
         List<Object> moversJsons = getMoversJsons(gameState);
         saveObj.put("moving-entities", moversJsons);
 
-        writeJson(saveObj);
         return saveObj;
     }
 
-    private static void writeJson(JSONObject saveObj) {
-        try {
-            PrintWriter pw = new PrintWriter(Constants.SAVE_FILE_PATH);
-            pw.write(saveObj.toJSONString());
-            pw.flush();
-            pw.close();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
+
 
     @NotNull
     private List<Object> getMoversJsons(GameState gameState) {

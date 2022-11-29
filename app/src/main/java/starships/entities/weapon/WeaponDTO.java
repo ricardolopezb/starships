@@ -26,8 +26,8 @@ public class WeaponDTO {
         dto.setWeaponType(WeaponType.valueOf((String)jsonObject.get("weapon-type")));
         dto.setBulletType(BulletType.valueOf((String)jsonObject.get("bullet-type")));
         dto.setShotType(ShotType.valueOf((String)jsonObject.get("shot-type")));
-        dto.setBulletsPerShot(((Long)jsonObject.get("shot-type")).intValue());
-        dto.setShotSpeed(((Double)jsonObject.get("shot-type")));
+        dto.setBulletsPerShot(((Long)jsonObject.get("bullets-per-shot")).intValue());
+        dto.setShotSpeed(((Double)jsonObject.get("shot-speed")));
         return dto;
     }
 

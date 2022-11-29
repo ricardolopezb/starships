@@ -6,7 +6,8 @@
         "rotate_counterclockwise": "A",
         "shoot": "SPACE",
         "change_weapon": "R",
-        "pause": "ESCAPE"
+        "pause": "ESCAPE",
+        "save": "ENTER"
     },
     {
         "accelerate": "UP",
@@ -15,6 +16,7 @@
         "rotate_counterclockwise": "LEFT",
         "shoot": "L",
         "change_weapon": "O",
-        "pause": "P"
+        "pause": "P",
+        "save": "ENTER"
     }
 ]

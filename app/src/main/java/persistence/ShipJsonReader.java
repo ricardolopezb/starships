@@ -35,7 +35,7 @@ public class ShipJsonReader {
 
     private ShipController readShipController(JSONObject initialConfigJson) {
         ShipMover shipMover = readShipMover((JSONObject)initialConfigJson.get("ship-mover"));
-        Weapon weapon = readWeapon((JSONObject) initialConfigJson.get("weapon-dto"), shipMover.getMover());
+        Weapon weapon = readWeapon((JSONObject) initialConfigJson.get("weapon"), shipMover.getMover());
 
 
 //        String shipSkin = (String) initialConfigJson.get("skin");
@@ -96,7 +96,7 @@ public class ShipJsonReader {
 
     public Ship readShipJson(JSONObject shipJson) {
         String id = (String) shipJson.get("id");
-        Integer health = ((Integer) shipJson.get("health"));
+        Integer health = ((Long) shipJson.get("health")).intValue();
         String skin = (String) shipJson.get("skin");
         return new Ship(id, health, skin);
     }

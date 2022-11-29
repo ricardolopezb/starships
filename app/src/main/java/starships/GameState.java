@@ -2,8 +2,7 @@ package starships;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.parser.ParseException;
-import persistence.Saver;
-import persistence.visitor.JSONWriteVisitor;
+import persistence.GameStateSaver;
 import persistence.visitor.Visitable;
 import persistence.visitor.Visitor;
 import starships.entities.Asteroid;
@@ -46,8 +45,6 @@ public class GameState implements Visitable {
     }
 
     public GameState accelerateShip(String shipId, Double coef) {
-        Saver saver = new Saver();
-        saver.saveGameState(this);
         Optional<ShipController> foundShip = findShip(shipId);
         if(foundShip.isPresent()){
             ShipController acceleratedShip = foundShip.get().accelerate(coef);
@@ -59,7 +56,8 @@ public class GameState implements Visitable {
 
     }
     public void save(){
-        this.accept(new JSONWriteVisitor());
+        GameStateSaver gameStateSaver = new GameStateSaver();
+        gameStateSaver.saveGameState(this);
     }
 
     public GameState rotateShip(String shipId, Integer degrees) {

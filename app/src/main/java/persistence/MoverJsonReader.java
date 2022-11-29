@@ -54,16 +54,16 @@ public class MoverJsonReader {
 
     private BaseEntity readAsteroid(JSONObject entityJson) {
         String id = (String) entityJson.get("id");
-        Integer health = (Integer) entityJson.get("health");
-        Integer size = (Integer) entityJson.get("size");
+        Integer health = ((Long) entityJson.get("health")).intValue();
+        Integer size = ((Long) entityJson.get("size")).intValue();
         return new Asteroid(id, size, health);
     }
 
     private BaseEntity readBullet(JSONObject entityJson) {
         String id = (String) entityJson.get("id");
         BulletType type = BulletType.valueOf((String) entityJson.get("bullet-type"));
-        Integer damage = (Integer) entityJson.get("damage");
-        Integer size = (Integer) entityJson.get("size");
+        Integer damage = ((Long) entityJson.get("damage")).intValue();
+        Integer size = ((Long) entityJson.get("size")).intValue();
         String ownerId = (String) entityJson.get("ownerId");
 
         return new Bullet(id, type, damage, size, ownerId);

@@ -189,7 +189,8 @@ class KeyPressedListener(): EventListener<KeyPressed> {
                     "rotate_counterclockwise" to KeyCode.valueOf(binding.get("rotate_counterclockwise") as String),
                     "shoot" to KeyCode.valueOf(binding.get("shoot") as String),
                     "change_weapon" to KeyCode.valueOf(binding.get("change_weapon") as String),
-                    "pause" to KeyCode.valueOf(binding.get("pause") as String)
+                    "pause" to KeyCode.valueOf(binding.get("pause") as String),
+                    "save" to KeyCode.valueOf(binding.get("save") as String)
             )
 
             mapToReturn["Ship-"+id] = bindingMap
@@ -217,9 +218,9 @@ class KeyPressedListener(): EventListener<KeyPressed> {
                 keyCodeMap["rotate_counterclockwise"] -> gameState = gameState.rotateShip(shipId, -Constants.SHIP_ROTATION_DEGREES)
                 keyCodeMap["shoot"] -> gameState = gameState.shoot(shipId)
                 keyCodeMap["change_weapon"] -> gameState = gameState.changeWeapon(shipId)
-                //keyCodeMap["pause"] -> Starships.paused = !Starships.paused
-                keyCodeMap["pause"] -> gameState.save()
-                //keyCodeMap["pause"] -> println("Lmao")
+                keyCodeMap["pause"] -> Starships.paused = !Starships.paused
+                keyCodeMap["save"] -> gameState.save()
+
                 else -> {}
             }
         }

@@ -4,26 +4,36 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import persistence.visitor.JSONWriteVisitor;
 import starships.GameState;
 import starships.entities.ship.ShipController;
 import starships.movement.Mover;
 
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class Saver {
+public class GameStateSaver {
 
     public void saveGameState(GameState gameState) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("scores", gameState.getScores());
-        jsonObject.put("removedIds", gameState.getRemovedIds());
-        jsonObject.put("ships", gameState.getShips());
-        System.out.println(jsonObject.toJSONString());
+        JSONWriteVisitor jsonVisitor = new JSONWriteVisitor();
+        JSONObject saveJson = gameState.accept(jsonVisitor);
+        writeJson(saveJson);
 
+    }
+    private static void writeJson(JSONObject saveObj) {
+        try {
+            PrintWriter pw = new PrintWriter(Constants.SAVE_FILE_PATH);
+            pw.write(saveObj.toJSONString());
+            pw.flush();
+            pw.close();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public GameState readGameState() throws IOException, ParseException {
