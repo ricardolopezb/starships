@@ -1,7 +1,6 @@
 package starships.entities.ship;
 
-import org.json.simple.JSONObject;
-import persistence.visitor.Visitor;
+import persistence.gamestate.visitor.Visitor;
 import starships.entities.BaseEntity;
 import starships.entities.Collidable;
 import persistence.Constants;

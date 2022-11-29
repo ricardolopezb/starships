@@ -20,14 +20,14 @@ public class Constants {
     public static final Double ASTEROID_SPAWN_RATE = 0.003; //0.001
 
     public static final String KEYBINDINGS_FILE_PATH = System.getProperty("user.dir") +
-            "/app/src/main/java/persistence/keybindings.json";
+            "/app/src/main/java/persistence/files/keybindings.json";
 
     public static final String INITIAL_CONFIG_FILE_PATH = System.getProperty("user.dir") +
-            "/app/src/main/java/persistence/initial_config_file.json";
+            "/app/src/main/java/persistence/files/initial_config_file.json";
 
 
     public static final Integer SHIP_SPAWN_POSITION_OFFSET = 70;
     public static final Integer STARTING_X_COORD = 300;
     public static final Integer STARTING_Y_COORD = 300;
-    public static final String SAVE_FILE_PATH = System.getProperty("user.dir") + "/app/src/main/java/persistence/save_file.json";;
+    public static final String SAVE_FILE_PATH = System.getProperty("user.dir") + "/app/src/main/java/persistence/files/save_file.json";;
 }

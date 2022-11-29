@@ -1,7 +1,7 @@
 package starships.physics;
 
-import persistence.visitor.Visitable;
-import persistence.visitor.Visitor;
+import persistence.gamestate.visitor.Visitable;
+import persistence.gamestate.visitor.Visitor;
 
 import java.util.Objects;
 

@@ -1,8 +1,7 @@
-package persistence.visitor;
+package persistence.gamestate.visitor;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
-import persistence.Constants;
 import starships.GameState;
 import starships.entities.Asteroid;
 import starships.entities.bullet.Bullet;
@@ -15,8 +14,6 @@ import starships.movement.ShipMover;
 import starships.physics.Position;
 import starships.physics.Vector;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.List;
 
 public class JSONWriteVisitor implements Visitor<JSONObject> {

@@ -1,4 +1,4 @@
-package persistence;
+package persistence.gamestate;
 
 import adapters.StarshipUIAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -6,6 +6,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import persistence.Constants;
 import starships.entities.EntityType;
 import starships.entities.ship.Ship;
 import starships.entities.ship.ShipController;

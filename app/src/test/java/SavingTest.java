@@ -2,10 +2,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.junit.Assert;
 import org.junit.Test;
-import persistence.GameStateSaver;
-import persistence.ShipJsonReader;
-import persistence.visitor.JSONWriteVisitor;
-import persistence.visitor.Visitor;
+import persistence.gamestate.GameStateSaver;
+import persistence.gamestate.ShipJsonReader;
+import persistence.gamestate.visitor.JSONWriteVisitor;
+import persistence.gamestate.visitor.Visitor;
 import starships.GameState;
 import starships.entities.ship.Ship;
 
@@ -27,7 +27,7 @@ public class SavingTest {
     @Test
     public void testGameStateRead() throws IOException, ParseException {
         GameStateSaver s = new GameStateSaver();
-        GameState gs = s.readGameState();
+        GameState gs = s.loadGameState();
         System.out.println("lmao");
     }
 

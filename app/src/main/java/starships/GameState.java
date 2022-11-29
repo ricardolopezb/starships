@@ -2,9 +2,8 @@ package starships;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.parser.ParseException;
-import persistence.GameStateSaver;
-import persistence.visitor.Visitable;
-import persistence.visitor.Visitor;
+import persistence.gamestate.visitor.Visitable;
+import persistence.gamestate.visitor.Visitor;
 import starships.entities.Asteroid;
 import starships.entities.BaseEntity;
 import starships.entities.bullet.Bullet;
@@ -55,15 +54,15 @@ public class GameState implements Visitable {
         }
 
     }
-    public void save(){
-        GameStateSaver gameStateSaver = new GameStateSaver();
-        gameStateSaver.saveGameState(this);
-    }
-
-    public GameState load(){
-        GameStateSaver gameStateSaver = new GameStateSaver();
-        return gameStateSaver.readGameState();
-    }
+//    public void save(){
+//        GameStateSaver gameStateSaver = new GameStateSaver();
+//        gameStateSaver.saveGameState(this);
+//    }
+//
+//    public static GameState loadGame(){
+//        GameStateSaver gameStateSaver = new GameStateSaver();
+//        return gameStateSaver.loadGameState();
+//    }
 
     public GameState rotateShip(String shipId, Integer degrees) {
         Optional<ShipController> foundShip = findShip(shipId);
@@ -289,15 +288,16 @@ public class GameState implements Visitable {
     }
 
 
-    public GameState initialize() throws IOException, ParseException {
+    public static GameState newGame() throws IOException, ParseException {
         ShipsInitializer shipsInitializer = new ShipsInitializer();
         List<Mover> movers = new ArrayList<>();
         List<ShipController> shipControllers = shipsInitializer.createShipControllers();
         Map<String, Integer> shipScores = initializeShipScores(shipControllers);
-        return new GameState(movers, shipControllers, this.removedIds, shipScores);
+        List<String> removedIds = new ArrayList<>();
+        return new GameState(movers, shipControllers, removedIds, shipScores);
     }
 
-    private Map<String, Integer> initializeShipScores(List<ShipController> shipControllers) {
+    private static Map<String, Integer> initializeShipScores(List<ShipController> shipControllers) {
         Map<String, Integer> scoresMap = new HashMap<>();
         for (ShipController shipController : shipControllers) {
             scoresMap.put(shipController.getId(), 0);

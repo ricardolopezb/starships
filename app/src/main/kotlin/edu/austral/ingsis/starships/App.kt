@@ -4,8 +4,11 @@ import edu.austral.ingsis.starships.ui.*
 import javafx.application.Application
 import javafx.application.Application.launch
 import javafx.collections.ObservableMap
+import javafx.event.EventHandler
 import javafx.scene.Scene
 import javafx.scene.input.KeyCode
+import javafx.scene.layout.StackPane
+import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
@@ -15,8 +18,10 @@ import starships.entities.ship.ShipController
 import starships.entities.BaseEntity
 import starships.movement.Mover
 import persistence.Constants
+import persistence.gamestate.GameStateSaver
 import persistence.WindowConfigurator
-import starships.utils.RandomNumberGenerator
+import java.awt.Button
+import java.awt.Label
 import java.io.FileReader
 
 fun main() {
@@ -27,26 +32,61 @@ class Starships() : Application() {
     private val imageResolver = CachedImageResolver(DefaultImageResolver())
     private val facade = ElementsViewFacade(imageResolver)
     private val keyTracker = KeyTracker()
+    private val gameSaver = GameStateSaver()
     companion object Paused {
         var paused = false
     }
 
+    var gameScene = Scene(StackPane())
+
+
+
+
+    private fun generateStartScene(primaryStage: Stage, gameInitializer: GameInitializer): Scene {
+        val gameTitle = javafx.scene.control.Label("[Game name]")
+        val newGameButton = javafx.scene.control.Button("New Game")
+        newGameButton.onAction = EventHandler {
+            startGameScene(gameInitializer, primaryStage, GameInitializer.GameStart.NEW)
+        }
+        val loadGameButton = javafx.scene.control.Button("Load Game")
+        loadGameButton.onAction = EventHandler {
+            startGameScene(gameInitializer, primaryStage, GameInitializer.GameStart.LOAD)
+        }
+        val layout = VBox()
+        layout.children.addAll(gameTitle, newGameButton, loadGameButton)
+        return Scene(layout)
+    }
+
+    private fun startGameScene(gameInitializer: GameInitializer, primaryStage: Stage, gameStart: GameInitializer.GameStart) {
+        gameState = gameInitializer.selectGameStart(gameStart)
+        insertCoreEntitiesIntoUI()
+        primaryStage.scene = gameScene
+    }
+
 
     override fun start(primaryStage: Stage) {
-        //gameState = GameState().initialize()
-        gameState = GameState().load()
-        //gameState.save()
+        val gameInitializer = GameInitializer(gameSaver)
+        val startScene = generateStartScene(primaryStage, gameInitializer)
+        primaryStage.scene = startScene
+
+
+        //gameState = gameInitializer.selectGameStart()
+
 
         val windowConfigurator = WindowConfigurator.getInstance()
-        insertCoreEntitiesIntoUI()
+
         val entityInSceneManager = EntityInSceneManager(facade)
         addEventListeners(entityInSceneManager)
 
-        val scene = Scene(facade.view)
-        keyTracker.scene = scene
+        gameScene = Scene(facade.view)
+        keyTracker.scene = gameScene
 
-        setUpPrimaryStage(primaryStage, scene, windowConfigurator)
+        setUpPrimaryStage(primaryStage, startScene, windowConfigurator)
 
+        startApplicationComponents(primaryStage)
+    }
+
+    private fun startApplicationComponents(primaryStage: Stage) {
         facade.start()
         keyTracker.start()
         primaryStage.show()
@@ -63,7 +103,7 @@ class Starships() : Application() {
         facade.collisionsListenable.addEventListener(CollisionListener())
         facade.outOfBoundsListenable.addEventListener(OutOfBoundsListener())
         facade.reachBoundsListenable.addEventListener(ReachBoundsListener())
-        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener())
+        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(gameSaver))
     }
 
     fun insertCoreEntitiesIntoUI() {
@@ -173,7 +213,7 @@ class CollisionListener() : EventListener<Collision> {
 
 }
 
-class KeyPressedListener(): EventListener<KeyPressed> {
+class KeyPressedListener(val gameSaver: GameStateSaver): EventListener<KeyPressed> {
 
     var keyBindingMap = insertBindings()
 
@@ -183,23 +223,24 @@ class KeyPressedListener(): EventListener<KeyPressed> {
         var id = 1
         while (it.hasNext()) {
             val binding = it.next() as JSONObject
-            val bindingMap = mapOf(
-                    "accelerate" to KeyCode.valueOf(binding.get("accelerate") as String),
-                    "brake" to KeyCode.valueOf(binding.get("brake") as String),
-                    "rotate_clockwise" to KeyCode.valueOf(binding.get("rotate_clockwise") as String),
-                    "rotate_counterclockwise" to KeyCode.valueOf(binding.get("rotate_counterclockwise") as String),
-                    "shoot" to KeyCode.valueOf(binding.get("shoot") as String),
-                    "change_weapon" to KeyCode.valueOf(binding.get("change_weapon") as String),
-                    "pause" to KeyCode.valueOf(binding.get("pause") as String),
-                    "save" to KeyCode.valueOf(binding.get("save") as String)
-            )
-
+            val bindingMap = loadMapWithBindings(binding)
             mapToReturn["Ship-"+id] = bindingMap
             id++
 
         }
         return mapToReturn
     }
+
+    private fun loadMapWithBindings(binding: JSONObject) = mapOf(
+            "accelerate" to KeyCode.valueOf(binding.get("accelerate") as String),
+            "brake" to KeyCode.valueOf(binding.get("brake") as String),
+            "rotate_clockwise" to KeyCode.valueOf(binding.get("rotate_clockwise") as String),
+            "rotate_counterclockwise" to KeyCode.valueOf(binding.get("rotate_counterclockwise") as String),
+            "shoot" to KeyCode.valueOf(binding.get("shoot") as String),
+            "change_weapon" to KeyCode.valueOf(binding.get("change_weapon") as String),
+            "pause" to KeyCode.valueOf(binding.get("pause") as String),
+            "save" to KeyCode.valueOf(binding.get("save") as String)
+    )
 
     private fun getKeybindingsMapIterator(): Iterator<*> {
         val obj = JSONParser().parse(FileReader(Constants.KEYBINDINGS_FILE_PATH))
@@ -211,19 +252,21 @@ class KeyPressedListener(): EventListener<KeyPressed> {
     override fun handle(event: KeyPressed) {
         val pressedKey = event.key
         for ((shipId, keyCodeMap) in keyBindingMap.entries.iterator()) {
+            handlePressedKeyAction(pressedKey, keyCodeMap, shipId)
+        }
+    }
 
-            when(pressedKey){
-                keyCodeMap["accelerate"] -> gameState = gameState.accelerateShip(shipId, Constants.SHIP_ACCELERATION_COEFFICIENT)
-                keyCodeMap["brake"] -> gameState = gameState.stopShip(shipId)
-                keyCodeMap["rotate_clockwise"] -> gameState = gameState.rotateShip(shipId, Constants.SHIP_ROTATION_DEGREES)
-                keyCodeMap["rotate_counterclockwise"] -> gameState = gameState.rotateShip(shipId, -Constants.SHIP_ROTATION_DEGREES)
-                keyCodeMap["shoot"] -> gameState = gameState.shoot(shipId)
-                keyCodeMap["change_weapon"] -> gameState = gameState.changeWeapon(shipId)
-                keyCodeMap["pause"] -> Starships.paused = !Starships.paused
-                keyCodeMap["save"] -> gameState.save()
-
-                else -> {}
-            }
+    private fun handlePressedKeyAction(pressedKey: KeyCode, keyCodeMap: Map<String, KeyCode>, shipId: String) {
+        when (pressedKey) {
+            keyCodeMap["accelerate"] -> gameState = gameState.accelerateShip(shipId, Constants.SHIP_ACCELERATION_COEFFICIENT)
+            keyCodeMap["brake"] -> gameState = gameState.stopShip(shipId)
+            keyCodeMap["rotate_clockwise"] -> gameState = gameState.rotateShip(shipId, Constants.SHIP_ROTATION_DEGREES)
+            keyCodeMap["rotate_counterclockwise"] -> gameState = gameState.rotateShip(shipId, -Constants.SHIP_ROTATION_DEGREES)
+            keyCodeMap["shoot"] -> gameState = gameState.shoot(shipId)
+            keyCodeMap["change_weapon"] -> gameState = gameState.changeWeapon(shipId)
+            keyCodeMap["pause"] -> Starships.paused = !Starships.paused
+            keyCodeMap["save"] -> gameSaver.saveGameState(gameState)
+            else -> {}
         }
     }
 
@@ -239,4 +282,26 @@ class ReachBoundsListener() : EventListener<ReachBounds> {
     override fun handle(event: ReachBounds) {
         gameState = gameState.handleReachBounds(event.id)
     }
+}
+
+class GameInitializer(val gameSaver: GameStateSaver){
+    enum class GameStart {
+        NEW, LOAD
+    }
+
+    fun selectGameStart(selectedStartMode: GameStart): GameState{
+        return when(selectedStartMode){
+            GameStart.NEW -> startNewGame()
+            GameStart.LOAD -> loadGame()
+        }
+    }
+
+    private fun startNewGame(): GameState {
+        return gameSaver.startNewGame()
+    }
+
+    private fun loadGame(): GameState {
+        return gameSaver.loadGameState()
+    }
+
 }

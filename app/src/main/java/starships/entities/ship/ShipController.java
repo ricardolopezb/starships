@@ -1,8 +1,8 @@
 package starships.entities.ship;
 
 import edu.austral.ingsis.starships.ui.ElementModel;
-import persistence.visitor.Visitable;
-import persistence.visitor.Visitor;
+import persistence.gamestate.visitor.Visitable;
+import persistence.gamestate.visitor.Visitor;
 import starships.entities.bullet.Bullet;
 import starships.entities.weapon.Weapon;
 import starships.entities.weapon.WeaponDTO;
@@ -12,7 +12,6 @@ import starships.movement.Mover;
 import starships.movement.ShipMover;
 
 import java.util.List;
-import java.util.Optional;
 
 public class ShipController implements Visitable {
     private final ShipMover shipMover;

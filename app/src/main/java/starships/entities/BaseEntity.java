@@ -1,6 +1,6 @@
 package starships.entities;
 
-import persistence.visitor.Visitable;
+import persistence.gamestate.visitor.Visitable;
 
 public abstract class BaseEntity implements Collidable, Visitable {
     protected final String id;

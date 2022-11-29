@@ -1,10 +1,11 @@
-package persistence;
+package persistence.gamestate;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import persistence.visitor.JSONWriteVisitor;
+import persistence.Constants;
+import persistence.gamestate.visitor.JSONWriteVisitor;
 import starships.GameState;
 import starships.entities.ship.ShipController;
 import starships.movement.Mover;
@@ -23,18 +24,12 @@ public class GameStateSaver {
         writeJson(saveJson);
 
     }
-    private static void writeJson(JSONObject saveObj) {
-        try {
-            PrintWriter pw = new PrintWriter(Constants.SAVE_FILE_PATH);
-            pw.write(saveObj.toJSONString());
-            pw.flush();
-            pw.close();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+
+    public GameState startNewGame() throws IOException, ParseException {
+        return GameState.newGame();
     }
 
-    public GameState readGameState() {
+    public GameState loadGameState() {
         Object obj = null;
         try {
             obj = new JSONParser().parse(new FileReader(Constants.SAVE_FILE_PATH));
@@ -64,7 +59,6 @@ public class GameStateSaver {
         return scores;
     }
 
-
     private List<Mover> readMovingEntities(JSONObject saveJson) {
         return new MoverJsonReader().readMovers((JSONArray) saveJson.get("moving-entities"));
     }
@@ -79,6 +73,17 @@ public class GameStateSaver {
 
     private static List<ShipController> readShipControllers(JSONObject saveJson) {
         return new ShipJsonReader().readShipControllers((JSONArray) saveJson.get("ships"));
+    }
+
+    private static void writeJson(JSONObject saveObj) {
+        try {
+            PrintWriter pw = new PrintWriter(Constants.SAVE_FILE_PATH);
+            pw.write(saveObj.toJSONString());
+            pw.flush();
+            pw.close();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

@@ -2,8 +2,8 @@ package starships.movement;
 
 import edu.austral.ingsis.starships.ui.ElementModel;
 import adapters.CoreEntityToUIElementAdapter;
-import persistence.visitor.Visitable;
-import persistence.visitor.Visitor;
+import persistence.gamestate.visitor.Visitable;
+import persistence.gamestate.visitor.Visitor;
 import starships.entities.BaseEntity;
 import starships.physics.Position;
 import starships.physics.Vector;

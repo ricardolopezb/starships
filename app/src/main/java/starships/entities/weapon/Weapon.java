@@ -1,8 +1,8 @@
 package starships.entities.weapon;
 
 import org.json.simple.JSONObject;
-import persistence.visitor.Visitable;
-import persistence.visitor.Visitor;
+import persistence.gamestate.visitor.Visitable;
+import persistence.gamestate.visitor.Visitor;
 import starships.entities.ship.Ship;
 import starships.entities.bullet.BulletFactory;
 import starships.entities.bullet.BulletType;

@@ -1,4 +1,4 @@
-package persistence;
+package persistence.gamestate;
 
 import adapters.AsteroidUIAdapter;
 import adapters.BulletUIAdapter;

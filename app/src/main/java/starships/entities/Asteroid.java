@@ -1,7 +1,6 @@
 package starships.entities;
 
-import org.json.simple.JSONObject;
-import persistence.visitor.Visitor;
+import persistence.gamestate.visitor.Visitor;
 import starships.utils.ScoreDTO;
 
 import java.util.Optional;
