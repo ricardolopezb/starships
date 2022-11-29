@@ -1,8 +1,11 @@
 package starships.physics;
 
+import persistence.visitor.Visitable;
+import persistence.visitor.Visitor;
+
 import java.util.Objects;
 
-public class Vector {
+public class Vector implements Visitable {
     private final Double x;
     private final Double y;
     private final Double radians;
@@ -72,5 +75,10 @@ public class Vector {
 
     private Double calculateMagnitude(){
         return Math.sqrt(x*x + y*y);
+    }
+
+    @Override
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visitVector(this);
     }
 }

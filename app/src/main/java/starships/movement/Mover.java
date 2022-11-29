@@ -2,11 +2,13 @@ package starships.movement;
 
 import edu.austral.ingsis.starships.ui.ElementModel;
 import adapters.CoreEntityToUIElementAdapter;
+import persistence.visitor.Visitable;
+import persistence.visitor.Visitor;
 import starships.entities.BaseEntity;
 import starships.physics.Position;
 import starships.physics.Vector;
 
-public class Mover<T extends BaseEntity> {
+public class Mover<T extends BaseEntity> implements Visitable {
     private final T entity;
     private final Position position;
     private final Vector movementVector;
@@ -53,5 +55,10 @@ public class Mover<T extends BaseEntity> {
 
     public ElementModel adapt() {
         return this.adapter.adapt(this);
+    }
+
+    @Override
+    public <U> U accept(Visitor<U> visitor) {
+        return visitor.visitMover(this);
     }
 }

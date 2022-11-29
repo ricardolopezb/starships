@@ -34,8 +34,9 @@ class Starships() : Application() {
 
     override fun start(primaryStage: Stage) {
         gameState = GameState().initialize()
+        //gameState.save()
 
-        val windowConfigurator = WindowConfigurator()
+        val windowConfigurator = WindowConfigurator.getInstance()
         insertCoreEntitiesIntoUI()
         val entityInSceneManager = EntityInSceneManager(facade)
         addEventListeners(entityInSceneManager)
@@ -216,7 +217,8 @@ class KeyPressedListener(): EventListener<KeyPressed> {
                 keyCodeMap["rotate_counterclockwise"] -> gameState = gameState.rotateShip(shipId, -Constants.SHIP_ROTATION_DEGREES)
                 keyCodeMap["shoot"] -> gameState = gameState.shoot(shipId)
                 keyCodeMap["change_weapon"] -> gameState = gameState.changeWeapon(shipId)
-                keyCodeMap["pause"] -> Starships.paused = !Starships.paused
+                //keyCodeMap["pause"] -> Starships.paused = !Starships.paused
+                keyCodeMap["pause"] -> gameState.save()
                 //keyCodeMap["pause"] -> println("Lmao")
                 else -> {}
             }

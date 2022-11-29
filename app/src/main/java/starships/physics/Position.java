@@ -1,6 +1,9 @@
 package starships.physics;
 
-public class Position {
+import persistence.visitor.Visitable;
+import persistence.visitor.Visitor;
+
+public class Position implements Visitable {
     private final Integer x;
     private final Integer y;
 
@@ -23,5 +26,10 @@ public class Position {
 
     public Integer getY() {
         return y;
+    }
+
+    @Override
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visitPosition(this);
     }
 }

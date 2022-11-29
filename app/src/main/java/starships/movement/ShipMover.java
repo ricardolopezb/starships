@@ -3,11 +3,13 @@ package starships.movement;
 import edu.austral.ingsis.starships.ui.ElementModel;
 import adapters.CoreEntityToUIElementAdapter;
 import persistence.Constants;
+import persistence.visitor.Visitable;
+import persistence.visitor.Visitor;
 import starships.entities.ship.Ship;
 import starships.physics.Position;
 import starships.physics.Vector;
 
-public class ShipMover {
+public class ShipMover implements Visitable {
     private final Mover<Ship> mover;
 
     public ShipMover(Mover<Ship> shipMover) {
@@ -73,5 +75,10 @@ public class ShipMover {
     public ShipMover resetPosition() {
         Mover<Ship> newMover = new Mover<>(mover.getEntity(), new Position(Constants.STARTING_X_COORD, Constants.STARTING_Y_COORD), new Vector(0.0, 0.0), mover.getFacingDirection(), mover.getAdapter());
         return new ShipMover(newMover);
+    }
+
+    @Override
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visitShipMover(this);
     }
 }

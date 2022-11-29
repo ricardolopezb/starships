@@ -1,5 +1,7 @@
 package starships.entities;
 
+import org.json.simple.JSONObject;
+import persistence.visitor.Visitor;
 import starships.utils.ScoreDTO;
 
 import java.util.Optional;
@@ -48,5 +50,10 @@ public class Asteroid extends BaseEntity{
     @Override
     public ScoreDTO getScore() {
         return new ScoreDTO(this.id, 0);
+    }
+
+    @Override
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visitAsteroid(this);
     }
 }

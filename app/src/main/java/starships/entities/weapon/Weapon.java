@@ -1,5 +1,8 @@
 package starships.entities.weapon;
 
+import org.json.simple.JSONObject;
+import persistence.visitor.Visitable;
+import persistence.visitor.Visitor;
 import starships.entities.ship.Ship;
 import starships.entities.bullet.BulletFactory;
 import starships.entities.bullet.BulletType;
@@ -10,7 +13,7 @@ import starships.entities.bullet.Bullet;
 
 import java.util.List;
 
-public class Weapon {
+public class Weapon implements Visitable {
     private final BulletFactory bulletFactory;
     private final WeaponType weaponType;
     private final ShotType shotType;
@@ -18,10 +21,6 @@ public class Weapon {
     private final Integer bulletsPerShot;
     private final Double shotSpeed;
 
-    // Aca le estoy pasando el mover al SpawnerFactory, para que con el pueda obtener lo que necesita para cada uno
-    //para el radial, solo toma la posicion,
-    // para el linear toma tambien la facing direction
-    // me hace ruido hacerlo asi
     public Weapon(WeaponType weaponType, BulletType bulletType, ShotType shotType, Integer bulletsPerShot, Double shotSpeed, Mover<Ship> mover) {
         this.bulletFactory = new BulletFactory(bulletType);
         this.weaponType = weaponType;
@@ -30,6 +29,16 @@ public class Weapon {
         this.shotSpeed = shotSpeed;
         this.multipleSpawner = factory.getSpawnerForShotType(shotType, mover, shotSpeed);
         this.bulletsPerShot = bulletsPerShot;
+    }
+
+    public JSONObject toJson() {
+        return WeaponDTO.fromWeapon(this).toJson();
+    }
+
+
+    public WeaponDTO fromJson(JSONObject json) {
+        WeaponDTO dto = new WeaponDTO();
+        return dto.fromJson(json);
     }
 
     public Weapon(WeaponDTO dto, Mover<Ship> mover){
@@ -69,5 +78,11 @@ public class Weapon {
 
     public Integer getBulletsPerShot() {
         return bulletsPerShot;
+    }
+
+
+    @Override
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visitWeapon(this);
     }
 }

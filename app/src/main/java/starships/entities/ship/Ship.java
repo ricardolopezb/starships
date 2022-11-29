@@ -1,5 +1,7 @@
 package starships.entities.ship;
 
+import org.json.simple.JSONObject;
+import persistence.visitor.Visitor;
 import starships.entities.BaseEntity;
 import starships.entities.Collidable;
 import persistence.Constants;
@@ -7,6 +9,7 @@ import starships.entities.EntityType;
 import starships.entities.bullet.Bullet;
 import starships.utils.ScoreDTO;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class Ship extends BaseEntity {
@@ -18,6 +21,7 @@ public class Ship extends BaseEntity {
         this.skin = skin;
         this.health = health;
     }
+
 
     //If damage destroys the ship, returns Empty.
     public Optional<Ship> takeDamage(Integer damage){
@@ -58,4 +62,22 @@ public class Ship extends BaseEntity {
         return otherAsEntity.getEntityType() == EntityType.BULLET && ((Bullet) otherAsEntity).getOwnerId().equals(this.id);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Ship ship = (Ship) o;
+        return Objects.equals(skin, ship.skin) && Objects.equals(health, ship.health)
+                && Objects.equals(id, ship.getId()) && Objects.equals(type, ship.getEntityType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(skin, health);
+    }
+
+    @Override
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visitShip(this);
+    }
 }

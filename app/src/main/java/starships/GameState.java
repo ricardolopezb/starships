@@ -2,6 +2,10 @@ package starships;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.parser.ParseException;
+import persistence.Saver;
+import persistence.visitor.JSONWriteVisitor;
+import persistence.visitor.Visitable;
+import persistence.visitor.Visitor;
 import starships.entities.Asteroid;
 import starships.entities.BaseEntity;
 import starships.entities.bullet.Bullet;
@@ -18,13 +22,12 @@ import starships.utils.ScoreDTO;
 import java.io.IOException;
 import java.util.*;
 
-public class GameState {
+public class GameState implements Visitable {
 
     private final List<Mover> movingEntities;
     private final List<ShipController> ships;
     private final List<String> removedIds;
     private final Map<String, Integer> scores;
-    private final AsteroidSpawner asteroidSpawner;
 
 
     public GameState(List<Mover> movingEntities, List<ShipController> ships, List<String> removedIds, Map<String, Integer> scores) {
@@ -32,7 +35,6 @@ public class GameState {
         this.ships = ships;
         this.scores = scores;
         this.removedIds = removedIds;
-        this.asteroidSpawner = new AsteroidSpawner();
     }
 
     public GameState(){
@@ -40,10 +42,12 @@ public class GameState {
         this.ships = new ArrayList<>();
         this.scores = new HashMap<>();
         this.removedIds = new ArrayList<>();
-        this.asteroidSpawner = new AsteroidSpawner();
+
     }
 
     public GameState accelerateShip(String shipId, Double coef) {
+        Saver saver = new Saver();
+        saver.saveGameState(this);
         Optional<ShipController> foundShip = findShip(shipId);
         if(foundShip.isPresent()){
             ShipController acceleratedShip = foundShip.get().accelerate(coef);
@@ -53,6 +57,9 @@ public class GameState {
             return this;
         }
 
+    }
+    public void save(){
+        this.accept(new JSONWriteVisitor());
     }
 
     public GameState rotateShip(String shipId, Integer degrees) {
@@ -233,6 +240,7 @@ public class GameState {
 
 
     public Mover<Asteroid> spawnAsteroid(){
+        AsteroidSpawner asteroidSpawner = new AsteroidSpawner();
         Integer targetShipIndex = RandomNumberGenerator.getRandomNumber(0, ships.size());
         Position targetShipPosition = ships.get(targetShipIndex).getShipMover().getPosition();
         return asteroidSpawner.spawnAsteroid(targetShipPosition);
@@ -334,4 +342,8 @@ public class GameState {
         return this;
     }
 
+    @Override
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visitGameState(this);
+    }
 }

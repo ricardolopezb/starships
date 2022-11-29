@@ -19,7 +19,7 @@ public class AsteroidSpawner {
 
 
     public AsteroidSpawner() {
-        WindowConfigurator wc = new WindowConfigurator();
+        WindowConfigurator wc = WindowConfigurator.getInstance();
 
 
         this.maxX = getIntegerPropertyValueWithDefault(wc, "width", 950);

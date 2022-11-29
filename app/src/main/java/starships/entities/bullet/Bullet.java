@@ -1,5 +1,7 @@
 package starships.entities.bullet;
 
+import org.json.simple.JSONObject;
+import persistence.visitor.Visitor;
 import starships.entities.BaseEntity;
 import starships.entities.Collidable;
 import starships.entities.EntityType;
@@ -53,5 +55,10 @@ public class Bullet extends BaseEntity {
 
     public String getOwnerId() {
         return ownerId;
+    }
+
+    @Override
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visitBullet(this);
     }
 }

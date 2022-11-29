@@ -10,9 +10,10 @@ import java.util.Optional;
 
 public class WindowConfigurator {
     private final JSONObject properties;
+    private static final WindowConfigurator instance = new WindowConfigurator();
 
 
-    public WindowConfigurator() {
+    private WindowConfigurator() {
         Object obj = null;
         try {
             obj = new JSONParser().parse(new FileReader(Constants.INITIAL_CONFIG_FILE_PATH));
@@ -28,5 +29,9 @@ public class WindowConfigurator {
     public Optional<Object> getProperty(String property){
         Object result = this.properties.get(property);
         return result != null ? Optional.of(result) : Optional.empty();
+    }
+
+    public static WindowConfigurator getInstance(){
+        return instance;
     }
 }
