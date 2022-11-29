@@ -25,7 +25,7 @@ public class GameStateSaver {
     }
     private static void writeJson(JSONObject saveObj) {
         try {
-            PrintWriter pw = new PrintWriter(Constants.WRITE_SAVE_FILE_PATH);
+            PrintWriter pw = new PrintWriter(Constants.SAVE_FILE_PATH);
             pw.write(saveObj.toJSONString());
             pw.flush();
             pw.close();
@@ -37,7 +37,7 @@ public class GameStateSaver {
     public GameState readGameState() {
         Object obj = null;
         try {
-            obj = new JSONParser().parse(new FileReader(Constants.WRITE_SAVE_FILE_PATH));
+            obj = new JSONParser().parse(new FileReader(Constants.SAVE_FILE_PATH));
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (ParseException e) {

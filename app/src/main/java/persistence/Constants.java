@@ -1,13 +1,5 @@
 package persistence;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Optional;
-
 public class Constants {
     public static final Integer SHIP_COLLISION_DAMAGE = 10;
     public static final Integer LASER_BULLET_DAMAGE = 15;
@@ -37,6 +29,5 @@ public class Constants {
     public static final Integer SHIP_SPAWN_POSITION_OFFSET = 70;
     public static final Integer STARTING_X_COORD = 300;
     public static final Integer STARTING_Y_COORD = 300;
-    public static final String READ_SAVE_FILE_PATH = System.getProperty("user.dir") + "/src/main/java/persistence/save_file.json";;
-    public static final String WRITE_SAVE_FILE_PATH = System.getProperty("user.dir") + "/app/src/main/java/persistence/save_file.json";;
+    public static final String SAVE_FILE_PATH = System.getProperty("user.dir") + "/app/src/main/java/persistence/save_file.json";;
 }
