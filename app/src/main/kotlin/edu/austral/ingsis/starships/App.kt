@@ -23,6 +23,7 @@ import persistence.WindowConfigurator
 import java.awt.Button
 import java.awt.Label
 import java.io.FileReader
+import java.util.ListResourceBundle
 
 fun main() {
     launch(Starships::class.java)
@@ -33,16 +34,31 @@ class Starships() : Application() {
     private val facade = ElementsViewFacade(imageResolver)
     private val keyTracker = KeyTracker()
     private val gameSaver = GameStateSaver()
+    var gameScene = Scene(StackPane())
+    var startScene = Scene(StackPane())
     companion object Paused {
         var paused = false
     }
 
-    var gameScene = Scene(StackPane())
+    override fun start(primaryStage: Stage) {
+        val gameInitializer = GameInitializer(gameSaver)
+        startScene = generateStartScene(primaryStage, gameInitializer)
+        primaryStage.scene = startScene
 
+        val windowConfigurator = WindowConfigurator.getInstance()
 
+        val entityInSceneManager = EntityInSceneManager(facade)
+        addEventListeners(entityInSceneManager, primaryStage, gameInitializer)
 
+        gameScene = Scene(facade.view)
+        keyTracker.scene = gameScene
 
-    private fun generateStartScene(primaryStage: Stage, gameInitializer: GameInitializer): Scene {
+        setUpPrimaryStage(primaryStage, startScene, windowConfigurator)
+
+        startApplicationComponents(primaryStage)
+    }
+
+    fun generateStartScene(primaryStage: Stage, gameInitializer: GameInitializer): Scene {
         val gameTitle = javafx.scene.control.Label("[Game name]")
         val newGameButton = javafx.scene.control.Button("New Game")
         newGameButton.onAction = EventHandler {
@@ -63,29 +79,6 @@ class Starships() : Application() {
         primaryStage.scene = gameScene
     }
 
-
-    override fun start(primaryStage: Stage) {
-        val gameInitializer = GameInitializer(gameSaver)
-        val startScene = generateStartScene(primaryStage, gameInitializer)
-        primaryStage.scene = startScene
-
-
-        //gameState = gameInitializer.selectGameStart()
-
-
-        val windowConfigurator = WindowConfigurator.getInstance()
-
-        val entityInSceneManager = EntityInSceneManager(facade)
-        addEventListeners(entityInSceneManager)
-
-        gameScene = Scene(facade.view)
-        keyTracker.scene = gameScene
-
-        setUpPrimaryStage(primaryStage, startScene, windowConfigurator)
-
-        startApplicationComponents(primaryStage)
-    }
-
     private fun startApplicationComponents(primaryStage: Stage) {
         facade.start()
         keyTracker.start()
@@ -98,8 +91,9 @@ class Starships() : Application() {
         primaryStage.width = (windowConfigurator.getProperty("width").get() as Long).toDouble()
     }
 
-    private fun addEventListeners(entityInSceneManager: EntityInSceneManager) {
-        facade.timeListenable.addEventListener(TimeListener(facade.elements, entityInSceneManager, Paused))
+    private fun addEventListeners(entityInSceneManager: EntityInSceneManager, primaryStage: Stage, gameInitializer: GameInitializer) {
+        val gameFinishedListener = GameFinishedListener(primaryStage, startScene, gameInitializer)
+        facade.timeListenable.addEventListener(TimeListener(facade.elements, entityInSceneManager, Paused, gameFinishedListener))
         facade.collisionsListenable.addEventListener(CollisionListener())
         facade.outOfBoundsListenable.addEventListener(OutOfBoundsListener())
         facade.reachBoundsListenable.addEventListener(ReachBoundsListener())
@@ -135,8 +129,22 @@ class EntityInSceneManager(private val facade: ElementsViewFacade){
 
 class TimeListener(private val elements: ObservableMap<String, ElementModel>,
                    private val inserter: EntityInSceneManager,
-                   private var paused: Starships.Paused) : EventListener<TimePassed> {
-    private val startingShips = gameState.ships.size
+                   private var paused: Starships.Paused,
+                   private val gameFinishedListener: GameFinishedListener
+
+                   ) : EventListener<TimePassed> {
+    private val startingShips = (WindowConfigurator.getInstance().getProperty("players").get() as Long).toInt()
+    private val gameFinishedEmitter = createGameFinishedEmitter(gameFinishedListener)
+
+    private fun createGameFinishedEmitter(gameFinishedListener: GameFinishedListener): ListenableEmitter<GameEnding> {
+        val gameEndingEmitter = ListenableEmitter<GameEnding>()
+        gameEndingEmitter.addEventListener(gameFinishedListener)
+        return gameEndingEmitter
+    }
+
+
+
+
     override fun handle(event: TimePassed) {
         if (Starships.paused) return
         val newShipList = ArrayList<ShipController>()
@@ -152,12 +160,22 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
     }
 
     private fun checkGameOver() {
-        if(gameState.ships.isEmpty()) println("Game Over!")
+        if(gameState.ships.isEmpty() && areDestroyedShips() && !gameFinishedListener.called)
+            gameFinishedEmitter.emit(GameEnding("DESTRUCTION", "0"))
+    }
+
+    private fun areDestroyedShips(): Boolean {
+        gameState.removedIds.forEach {
+            if (it.startsWith("Ship")) return true
+        }
+        return false
+
     }
 
     private fun checkMultiplayerVictory() {
-        if(gameState.ships.size == 1){
-            println(gameState.ships[0].id + " won!")
+        if(gameState.ships.size == 1 && !gameFinishedListener.called){
+            //println(gameState.ships[0].id + " won!")
+            gameFinishedEmitter.emit(GameEnding("WIN", gameState.ships[0].id.drop(5)))
         }
     }
 
@@ -271,6 +289,49 @@ class KeyPressedListener(val gameSaver: GameStateSaver): EventListener<KeyPresse
     }
 
 }
+
+data class GameEnding(val endingType: String, val winnerId: String)
+
+
+
+class GameFinishedListener(val primaryStage: Stage, val startScene: Scene, val gameInitializer: GameInitializer): EventListener<GameEnding> {
+    var called = false
+    private fun createGameOverScene(): Scene {
+        val gameOverLabel = javafx.scene.control.Label("Game Over")
+//        val playAgainButton = javafx.scene.control.Button("Play again")
+//        playAgainButton.onAction = EventHandler {
+//            gameState = gameInitializer.selectGameStart(GameInitializer.GameStart.NEW)
+//            primaryStage.scene = startScene
+//        }
+        val layout = VBox()
+        layout.children.addAll(gameOverLabel)
+        return Scene(layout)
+    }
+
+    override fun handle(event: GameEnding) {
+        called = true
+        if(event.endingType.equals("DESTRUCTION")){
+            val gameOverScene = createGameOverScene()
+            primaryStage.scene = gameOverScene
+        } else if(event.endingType.equals("WIN")){
+            val winningScene = createWinningScene(event.winnerId)
+            primaryStage.scene = winningScene
+        }
+    }
+
+    private fun createWinningScene(winnerId: String): Scene {
+        val gameOverLabel = javafx.scene.control.Label("Player " + winnerId + "wins!")
+//        val playAgainButton = javafx.scene.control.Button("Play again")
+//        playAgainButton.onAction = EventHandler {
+//            primaryStage.scene = startScene
+//        }
+        val layout = VBox()
+        layout.children.addAll(gameOverLabel)
+        return Scene(layout)
+    }
+
+}
+
 
 class OutOfBoundsListener() : EventListener<OutOfBounds> {
     override fun handle(event: OutOfBounds) {

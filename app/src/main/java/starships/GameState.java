@@ -26,6 +26,7 @@ public class GameState implements Visitable {
     private final List<ShipController> ships;
     private final List<String> removedIds;
     private final Map<String, Integer> scores;
+    private final Boolean validState;
 
 
     public GameState(List<Mover> movingEntities, List<ShipController> ships, List<String> removedIds, Map<String, Integer> scores) {
@@ -33,6 +34,7 @@ public class GameState implements Visitable {
         this.ships = ships;
         this.scores = scores;
         this.removedIds = removedIds;
+        this.validState = true;
     }
 
     public GameState(){
@@ -40,6 +42,7 @@ public class GameState implements Visitable {
         this.ships = new ArrayList<>();
         this.scores = new HashMap<>();
         this.removedIds = new ArrayList<>();
+        this.validState = false;
 
     }
 
@@ -54,7 +57,11 @@ public class GameState implements Visitable {
         }
 
     }
-//    public void save(){
+
+    public Boolean getValidState() {
+        return validState;
+    }
+    //    public void save(){
 //        GameStateSaver gameStateSaver = new GameStateSaver();
 //        gameStateSaver.saveGameState(this);
 //    }
@@ -146,7 +153,7 @@ public class GameState implements Visitable {
 
     private Map<String, Integer> addScoreToMover(Map<String, Integer> newScores, ScoreDTO score) {
         Map<String, Integer> scoreMapToAdd = new HashMap<>(newScores);
-        if(newScores.containsKey(score.id())){
+           if(newScores.containsKey(score.id())){
             Integer value = newScores.get(score.id()).intValue();
             scoreMapToAdd.put(score.id(), value + score.score());
         }
