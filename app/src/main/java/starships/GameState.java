@@ -60,6 +60,11 @@ public class GameState implements Visitable {
         gameStateSaver.saveGameState(this);
     }
 
+    public GameState load(){
+        GameStateSaver gameStateSaver = new GameStateSaver();
+        return gameStateSaver.readGameState();
+    }
+
     public GameState rotateShip(String shipId, Integer degrees) {
         Optional<ShipController> foundShip = findShip(shipId);
         if(foundShip.isPresent()){
@@ -143,7 +148,7 @@ public class GameState implements Visitable {
     private Map<String, Integer> addScoreToMover(Map<String, Integer> newScores, ScoreDTO score) {
         Map<String, Integer> scoreMapToAdd = new HashMap<>(newScores);
         if(newScores.containsKey(score.id())){
-            Integer value = newScores.get(score.id());
+            Integer value = newScores.get(score.id()).intValue();
             scoreMapToAdd.put(score.id(), value + score.score());
         }
         return scoreMapToAdd;

@@ -13,9 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GameStateSaver {
 
@@ -27,7 +25,7 @@ public class GameStateSaver {
     }
     private static void writeJson(JSONObject saveObj) {
         try {
-            PrintWriter pw = new PrintWriter(Constants.SAVE_FILE_PATH);
+            PrintWriter pw = new PrintWriter(Constants.WRITE_SAVE_FILE_PATH);
             pw.write(saveObj.toJSONString());
             pw.flush();
             pw.close();
@@ -36,18 +34,36 @@ public class GameStateSaver {
         }
     }
 
-    public GameState readGameState() throws IOException, ParseException {
-        Object obj = new JSONParser().parse(new FileReader(Constants.SAVE_FILE_PATH));
+    public GameState readGameState() {
+        Object obj = null;
+        try {
+            obj = new JSONParser().parse(new FileReader(Constants.WRITE_SAVE_FILE_PATH));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
         JSONObject saveJson = (JSONObject) obj;
 
         List<String> removedIds = readRemovedIds((JSONArray) saveJson.get("removedIds"));
-        Map<String, Integer> scores = (Map) saveJson.get("scores");
+        Map<String, Integer> scores = readScores((JSONObject) saveJson.get("scores"));
 
         List<ShipController> shipControllers = readShipControllers(saveJson);
         List<Mover> movingEntities = readMovingEntities(saveJson);
         return new GameState(movingEntities, shipControllers, removedIds, scores);
 
     }
+
+    private Map<String, Integer> readScores(JSONObject object) {
+        Map<String, Integer> scores = new HashMap<>();
+        Iterator<Map.Entry> it = object.entrySet().iterator();
+        while (it.hasNext()){
+            Map.Entry pair = it.next();
+            scores.put((String)pair.getKey(), ((Long) pair.getValue()).intValue());
+        }
+        return scores;
+    }
+
 
     private List<Mover> readMovingEntities(JSONObject saveJson) {
         return new MoverJsonReader().readMovers((JSONArray) saveJson.get("moving-entities"));

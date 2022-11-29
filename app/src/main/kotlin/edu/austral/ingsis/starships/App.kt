@@ -33,7 +33,8 @@ class Starships() : Application() {
 
 
     override fun start(primaryStage: Stage) {
-        gameState = GameState().initialize()
+        //gameState = GameState().initialize()
+        gameState = GameState().load()
         //gameState.save()
 
         val windowConfigurator = WindowConfigurator.getInstance()
