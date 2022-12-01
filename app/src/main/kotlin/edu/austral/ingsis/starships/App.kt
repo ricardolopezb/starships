@@ -320,7 +320,7 @@ class GameFinishedListener(val primaryStage: Stage, val startScene: Scene, val g
     }
 
     private fun createWinningScene(winnerId: String): Scene {
-        val gameOverLabel = javafx.scene.control.Label("Player " + winnerId + "wins!")
+        val gameOverLabel = javafx.scene.control.Label("Player $winnerId wins!")
 //        val playAgainButton = javafx.scene.control.Button("Play again")
 //        playAgainButton.onAction = EventHandler {
 //            primaryStage.scene = startScene
