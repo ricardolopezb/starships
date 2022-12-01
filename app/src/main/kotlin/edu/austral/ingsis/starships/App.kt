@@ -46,12 +46,11 @@ class Starships() : Application() {
         val gameInitializer = GameInitializer(gameSaver)
         startScene = generateStartScene(primaryStage, gameInitializer)
         primaryStage.scene = startScene
-        val windowConfigurator = WindowConfigurator.getInstance()
         val entityInSceneManager = EntityInSceneManager(facade)
         addEventListeners(entityInSceneManager, primaryStage, gameInitializer)
         gameScene = Scene(facade.view)
         keyTracker.scene = gameScene
-        setUpPrimaryStage(primaryStage, startScene, windowConfigurator)
+        setUpPrimaryStage(primaryStage, startScene)
         startApplicationComponents(primaryStage)
     }
 
@@ -62,17 +61,27 @@ class Starships() : Application() {
 
     fun generateStartScene(primaryStage: Stage, gameInitializer: GameInitializer): Scene {
         val gameTitle = javafx.scene.control.Label("Starships")
+        val newGameButton = createNewGameButton(gameInitializer, primaryStage)
+        val loadGameButton = createLoadGameButton(gameInitializer, primaryStage)
+        val layout = VBox()
+        layout.children.addAll(gameTitle, newGameButton, loadGameButton)
+        return Scene(layout)
+    }
+
+    private fun createNewGameButton(gameInitializer: GameInitializer, primaryStage: Stage): javafx.scene.control.Button {
         val newGameButton = javafx.scene.control.Button("New Game")
         newGameButton.onAction = EventHandler {
             startGameScene(gameInitializer, primaryStage, GameInitializer.GameStart.NEW)
         }
+        return newGameButton
+    }
+
+    private fun createLoadGameButton(gameInitializer: GameInitializer, primaryStage: Stage): javafx.scene.control.Button {
         val loadGameButton = javafx.scene.control.Button("Load Game")
         loadGameButton.onAction = EventHandler {
             startGameScene(gameInitializer, primaryStage, GameInitializer.GameStart.LOAD)
         }
-        val layout = VBox()
-        layout.children.addAll(gameTitle, newGameButton, loadGameButton)
-        return Scene(layout)
+        return loadGameButton
     }
 
     private fun startGameScene(gameInitializer: GameInitializer, primaryStage: Stage, gameStart: GameInitializer.GameStart) {
@@ -87,7 +96,8 @@ class Starships() : Application() {
         primaryStage.show()
     }
 
-    private fun setUpPrimaryStage(primaryStage: Stage, scene: Scene, windowConfigurator: WindowConfigurator) {
+    private fun setUpPrimaryStage(primaryStage: Stage, scene: Scene) {
+        val windowConfigurator = WindowConfigurator.getInstance()
         primaryStage.scene = scene
         primaryStage.height = (windowConfigurator.getProperty("height").get() as Long).toDouble()
         primaryStage.width = (windowConfigurator.getProperty("width").get() as Long).toDouble()
