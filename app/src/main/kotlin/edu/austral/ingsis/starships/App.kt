@@ -49,6 +49,8 @@ class Starships() : Application() {
         val entityInSceneManager = EntityInSceneManager(facade)
         addEventListeners(entityInSceneManager, primaryStage, gameInitializer)
         gameScene = Scene(facade.view)
+        facade.view.id = "facade"
+        gameScene.stylesheets.add(this::class.java.classLoader.getResource("gameStyles.css")?.toString())
         keyTracker.scene = gameScene
         setUpPrimaryStage(primaryStage, startScene)
         startApplicationComponents(primaryStage)
