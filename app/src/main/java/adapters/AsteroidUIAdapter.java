@@ -10,6 +10,7 @@ public class AsteroidUIAdapter implements CoreEntityToUIElementAdapter<Asteroid>
     @Override
     public ElementModel adapt(Mover<Asteroid> mover) {
         Integer size = mover.getEntity().getSize();
+        String selectedImage = Math.random() <= 0.5 ? "asteroid" : "satellite";
         return new ElementModel(
                 mover.getId(),
                 mover.getPosition().getX(),
@@ -18,7 +19,7 @@ public class AsteroidUIAdapter implements CoreEntityToUIElementAdapter<Asteroid>
                 size,
                 mover.getFacingDirection().getDegrees(),
                 ElementColliderType.Elliptical,
-                new ImageRef("asteroid", 70, 70)
+                new ImageRef(selectedImage, size, size)
         );
 
     }

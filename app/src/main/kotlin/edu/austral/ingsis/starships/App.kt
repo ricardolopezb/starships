@@ -3,6 +3,7 @@ package edu.austral.ingsis.starships
 import edu.austral.ingsis.starships.ui.*
 import javafx.application.Application
 import javafx.application.Application.launch
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.ObservableMap
 import javafx.event.EventHandler
 import javafx.scene.Scene
@@ -41,6 +42,7 @@ class Starships() : Application() {
     }
 
     override fun start(primaryStage: Stage) {
+        cleanFacade()
         val gameInitializer = GameInitializer(gameSaver)
         startScene = generateStartScene(primaryStage, gameInitializer)
         primaryStage.scene = startScene
@@ -53,8 +55,13 @@ class Starships() : Application() {
         startApplicationComponents(primaryStage)
     }
 
+    private fun cleanFacade() {
+        facade.showCollider.value = true
+        facade.showGrid.value = false
+    }
+
     fun generateStartScene(primaryStage: Stage, gameInitializer: GameInitializer): Scene {
-        val gameTitle = javafx.scene.control.Label("[Game name]")
+        val gameTitle = javafx.scene.control.Label("Starships")
         val newGameButton = javafx.scene.control.Button("New Game")
         newGameButton.onAction = EventHandler {
             startGameScene(gameInitializer, primaryStage, GameInitializer.GameStart.NEW)
@@ -184,6 +191,8 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
                 elements[it.id]?.y?.set(updatedMoverElementModel.y.value)
                 if(it.id.startsWith("Asteroid"))
                     elements[it.id]?.rotationInDegrees?.set(elements[it.id]?.rotationInDegrees!!.value + 1)
+                    elements[it.id]?.height?.set(elements[it.id]?.height!!.value)
+                    elements[it.id]?.width?.set(elements[it.id]?.width!!.value)
             } else {
                 inserter.insert(updatedMoverElementModel)
                 //elements[updatedMoverElementModel.id] = updatedMoverElementModel

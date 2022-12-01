@@ -43,7 +43,7 @@ public class Asteroid extends BaseEntity{
 
     public Optional<Asteroid> takeDamage(Integer damage){
         if(damage >= this.health) return Optional.empty();
-        else return Optional.of(new Asteroid(this.id, this.size, this.health-damage));
+        else return Optional.of(new Asteroid(this.id, this.size-10, this.health-damage));
     }
 
     @Override

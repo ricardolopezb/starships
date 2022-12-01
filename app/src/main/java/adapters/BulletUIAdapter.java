@@ -12,9 +12,17 @@ public class BulletUIAdapter implements CoreEntityToUIElementAdapter<Bullet>{
     public ElementModel adapt(Mover<Bullet> mover) {
 
         BulletType type = mover.getEntity().getBulletType();
-        ImageRef bulletPicture = switch (type) {
-            case LASER -> new ImageRef("laser_bullet", 20, 20);
-            case EXPLOSIVE -> new ImageRef("explosive_bullet", 20, 20);
+        Double height =0.0;
+        ImageRef bulletPicture = null;
+        switch (type) {
+            case LASER -> {
+                height = 5.45;
+                bulletPicture = new ImageRef("laser_bullet", 5.45, 20);
+            }
+            case EXPLOSIVE -> {
+                height = 20.0;
+                bulletPicture = new ImageRef("unnamed", 20, 20);
+            }
             //case PLASMA -> new ImageRef("plasma_bullet", 20,20);
         };
 
@@ -23,8 +31,8 @@ public class BulletUIAdapter implements CoreEntityToUIElementAdapter<Bullet>{
                 mover.getId(),
                 mover.getPosition().getX(),
                 mover.getPosition().getY(),
-                10.0,
-                10.0,
+                height, //5.45 para laser
+                20,
                 mover.getFacingDirection().getDegrees(),
                 ElementColliderType.Rectangular,
                 bulletPicture
