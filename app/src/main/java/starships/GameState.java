@@ -58,18 +58,6 @@ public class GameState implements Visitable {
 
     }
 
-    public Boolean getValidState() {
-        return validState;
-    }
-    //    public void save(){
-//        GameStateSaver gameStateSaver = new GameStateSaver();
-//        gameStateSaver.saveGameState(this);
-//    }
-//
-//    public static GameState loadGame(){
-//        GameStateSaver gameStateSaver = new GameStateSaver();
-//        return gameStateSaver.loadGameState();
-//    }
 
     public GameState rotateShip(String shipId, Integer degrees) {
         Optional<ShipController> foundShip = findShip(shipId);
@@ -191,7 +179,6 @@ public class GameState implements Visitable {
             removedIdsCopy.add(element1.get().getId());
             return;
         }
-
         if(collisionResult.get().getId().startsWith("Ship")){
             ShipController collidedShipController = getCollidedShipController(collisionResult);
             shipsCopy.add(collidedShipController);
@@ -244,8 +231,6 @@ public class GameState implements Visitable {
         }
         return Optional.empty();
     }
-
-
 
 
     public Mover<Asteroid> spawnAsteroid(){

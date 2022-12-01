@@ -44,17 +44,12 @@ class Starships() : Application() {
         val gameInitializer = GameInitializer(gameSaver)
         startScene = generateStartScene(primaryStage, gameInitializer)
         primaryStage.scene = startScene
-
         val windowConfigurator = WindowConfigurator.getInstance()
-
         val entityInSceneManager = EntityInSceneManager(facade)
         addEventListeners(entityInSceneManager, primaryStage, gameInitializer)
-
         gameScene = Scene(facade.view)
         keyTracker.scene = gameScene
-
         setUpPrimaryStage(primaryStage, startScene, windowConfigurator)
-
         startApplicationComponents(primaryStage)
     }
 
@@ -303,9 +298,21 @@ class GameFinishedListener(val primaryStage: Stage, val startScene: Scene, val g
 //            gameState = gameInitializer.selectGameStart(GameInitializer.GameStart.NEW)
 //            primaryStage.scene = startScene
 //        }
+
+        val scoresLabel = javafx.scene.control.Label(generateScoresString())
         val layout = VBox()
-        layout.children.addAll(gameOverLabel)
+        layout.children.addAll(gameOverLabel, scoresLabel)
         return Scene(layout)
+    }
+
+    private fun generateScoresString(): String {
+        var scoresString = ""
+        gameState.scores.forEach {
+            val (shipId, score) = it
+            val playerNumber = shipId.drop(5)
+            scoresString = "$scoresString\nPlayer $playerNumber - $score points"
+        }
+        return scoresString
     }
 
     override fun handle(event: GameEnding) {
@@ -325,8 +332,9 @@ class GameFinishedListener(val primaryStage: Stage, val startScene: Scene, val g
 //        playAgainButton.onAction = EventHandler {
 //            primaryStage.scene = startScene
 //        }
+        val scoresLabel = javafx.scene.control.Label(generateScoresString())
         val layout = VBox()
-        layout.children.addAll(gameOverLabel)
+        layout.children.addAll(gameOverLabel, scoresLabel)
         return Scene(layout)
     }
 
