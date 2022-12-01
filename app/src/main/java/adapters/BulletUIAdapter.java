@@ -21,7 +21,7 @@ public class BulletUIAdapter implements CoreEntityToUIElementAdapter<Bullet>{
             }
             case EXPLOSIVE -> {
                 height = 20.0;
-                bulletPicture = new ImageRef("unnamed", 20, 20);
+                bulletPicture = new ImageRef("explosive_bullet", 20, 20);
             }
             //case PLASMA -> new ImageRef("plasma_bullet", 20,20);
         };
