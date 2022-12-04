@@ -6,6 +6,11 @@
             "skin": "BASIC",
             "health": 150,
             "weaponType": "LASER"
+        },
+        {
+            "skin": "BASIC",
+            "health": 150,
+            "weaponType": "LASER"
         }
 
 
@@ -15,6 +20,6 @@
     "window": {
         "height": 800,
         "width": 950,
-        "players": 1
+        "players": 2
     }
 }

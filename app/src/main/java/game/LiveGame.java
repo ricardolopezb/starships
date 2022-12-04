@@ -1,8 +1,7 @@
-package starships.game;
+package game;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.parser.ParseException;
-import persistence.gamestate.visitor.Visitable;
 import persistence.gamestate.visitor.Visitor;
 import starships.entities.Asteroid;
 import starships.entities.BaseEntity;

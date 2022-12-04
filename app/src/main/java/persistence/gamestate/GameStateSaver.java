@@ -6,8 +6,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import persistence.Constants;
 import persistence.gamestate.visitor.JSONWriteVisitor;
-import starships.game.GameState;
-import starships.game.LiveGame;
+import game.GameState;
+import game.LiveGame;
 import starships.entities.ship.ShipController;
 import starships.movement.Mover;
 

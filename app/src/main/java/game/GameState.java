@@ -1,4 +1,4 @@
-package starships.game;
+package game;
 
 import persistence.gamestate.visitor.Visitable;
 import starships.entities.Asteroid;

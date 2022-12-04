@@ -1,6 +1,6 @@
 package persistence.gamestate.visitor;
 
-import starships.game.LiveGame;
+import game.LiveGame;
 import starships.entities.Asteroid;
 import starships.entities.bullet.Bullet;
 import starships.entities.ship.Ship;

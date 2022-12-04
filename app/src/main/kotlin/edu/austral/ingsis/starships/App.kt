@@ -14,14 +14,16 @@ import javafx.stage.Stage
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
-import starships.game.LiveGame
+import game.LiveGame
 import starships.entities.ship.ShipController
 import starships.entities.BaseEntity
 import starships.movement.Mover
 import persistence.Constants
 import persistence.gamestate.GameStateSaver
 import persistence.WindowConfigurator
-import starships.game.GameState
+import game.GameState
+import game.actions.Action
+import game.actions.ActionMapper
 import java.io.FileReader
 
 fun main() {
@@ -289,30 +291,39 @@ class KeyPressedListener(val gameSaver: GameStateSaver): EventListener<KeyPresse
 
     var keyBindingMap = insertBindings()
 
-    fun insertBindings(): Map<String, Map<String, KeyCode>>{
-        val mapToReturn = HashMap<String, Map<String, KeyCode>>()
+    fun insertBindings(): Map<KeyCode, Action>{
+        //val mapToReturn = HashMap<String, Map<String, KeyCode>>()
+        val mapToReturn = HashMap<KeyCode, Action>()
         val it: Iterator<*> = getKeybindingsMapIterator()
         var id = 1
         while (it.hasNext()) {
             val binding = it.next() as JSONObject
-            val bindingMap = loadMapWithBindings(binding)
-            mapToReturn["Ship-"+id] = bindingMap
+            loadMapWithBindings(binding, ("Ship-"+id), mapToReturn)
+            //mapToReturn["Ship-"+id] = bindingMap
             id++
 
         }
         return mapToReturn
     }
 
-    private fun loadMapWithBindings(binding: JSONObject) = mapOf(
-            "accelerate" to KeyCode.valueOf(binding.get("accelerate") as String),
-            "brake" to KeyCode.valueOf(binding.get("brake") as String),
-            "rotate_clockwise" to KeyCode.valueOf(binding.get("rotate_clockwise") as String),
-            "rotate_counterclockwise" to KeyCode.valueOf(binding.get("rotate_counterclockwise") as String),
-            "shoot" to KeyCode.valueOf(binding.get("shoot") as String),
-            "change_weapon" to KeyCode.valueOf(binding.get("change_weapon") as String),
-            "pause" to KeyCode.valueOf(binding.get("pause") as String),
-            "save" to KeyCode.valueOf(binding.get("save") as String)
-    )
+    private fun loadMapWithBindings(binding: JSONObject, shipId: String, bindingsMap: MutableMap<KeyCode, Action>) {
+        val existingActions = binding.keys as Set<String>
+        existingActions.forEach {
+            val correspondingAction = ActionMapper.getShipActionForDescription(shipId, it)
+            bindingsMap.put(KeyCode.valueOf(binding.get(it) as String), correspondingAction)
+        }
+    }
+
+//    private fun loadMapWithBindings(binding: JSONObject) = mapOf(
+//            "accelerate" to KeyCode.valueOf(binding.get("accelerate") as String),
+//            "brake" to KeyCode.valueOf(binding.get("brake") as String),
+//            "rotate_clockwise" to KeyCode.valueOf(binding.get("rotate_clockwise") as String),
+//            "rotate_counterclockwise" to KeyCode.valueOf(binding.get("rotate_counterclockwise") as String),
+//            "shoot" to KeyCode.valueOf(binding.get("shoot") as String),
+//            "change_weapon" to KeyCode.valueOf(binding.get("change_weapon") as String),
+//            "pause" to KeyCode.valueOf(binding.get("pause") as String),
+//            "save" to KeyCode.valueOf(binding.get("save") as String)
+//    )
 
     private fun getKeybindingsMapIterator(): Iterator<*> {
         val obj = JSONParser().parse(FileReader(Constants.KEYBINDINGS_FILE_PATH))
@@ -322,26 +333,24 @@ class KeyPressedListener(val gameSaver: GameStateSaver): EventListener<KeyPresse
     }
 
     override fun handle(event: KeyPressed) {
-        val pressedKey = event.key
-        for ((shipId, keyCodeMap) in keyBindingMap.entries.iterator()) {
-            handlePressedKeyAction(pressedKey, keyCodeMap, shipId)
-        }
+        if(keyBindingMap.containsKey(event.key))
+            gameState = keyBindingMap.get(event.key)!!.applyAction(gameState)
     }
 
-    private fun handlePressedKeyAction(pressedKey: KeyCode, keyCodeMap: Map<String, KeyCode>, shipId: String) {
-        when (pressedKey) {
-            keyCodeMap["accelerate"] -> gameState = gameState.accelerateShip(shipId, Constants.SHIP_ACCELERATION_COEFFICIENT)
-            keyCodeMap["brake"] -> gameState = gameState.stopShip(shipId)
-            keyCodeMap["rotate_clockwise"] -> gameState = gameState.rotateShip(shipId, Constants.SHIP_ROTATION_DEGREES)
-            keyCodeMap["rotate_counterclockwise"] -> gameState = gameState.rotateShip(shipId, -Constants.SHIP_ROTATION_DEGREES)
-            keyCodeMap["shoot"] -> gameState = gameState.shoot(shipId)
-            keyCodeMap["change_weapon"] -> gameState = gameState.changeWeapon(shipId)
-            //keyCodeMap["pause"] -> Starships.paused = !Starships.paused
-            keyCodeMap["pause"] -> gameState = gameState.pause()
-            keyCodeMap["save"] -> gameSaver.saveGameState(gameState)
-            else -> {}
-        }
-    }
+//    private fun handlePressedKeyAction(pressedKey: KeyCode, keyCodeMap: Map<String, KeyCode>, shipId: String) {
+//        when (pressedKey) {
+//            keyCodeMap["accelerate"] -> gameState = gameState.accelerateShip(shipId, Constants.SHIP_ACCELERATION_COEFFICIENT)
+//            keyCodeMap["brake"] -> gameState = gameState.stopShip(shipId)
+//            keyCodeMap["rotate_clockwise"] -> gameState = gameState.rotateShip(shipId, Constants.SHIP_ROTATION_DEGREES)
+//            keyCodeMap["rotate_counterclockwise"] -> gameState = gameState.rotateShip(shipId, -Constants.SHIP_ROTATION_DEGREES)
+//            keyCodeMap["shoot"] -> gameState = gameState.shoot(shipId)
+//            keyCodeMap["change_weapon"] -> gameState = gameState.changeWeapon(shipId)
+//            //keyCodeMap["pause"] -> Starships.paused = !Starships.paused
+//            keyCodeMap["pause"] -> gameState = gameState.pause()
+//            keyCodeMap["save"] -> gameSaver.saveGameState(gameState)
+//            else -> {}
+//        }
+//    }
 
 }
 

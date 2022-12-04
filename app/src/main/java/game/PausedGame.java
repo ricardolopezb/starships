@@ -1,4 +1,4 @@
-package starships.game;
+package game;
 
 import adapters.AsteroidUIAdapter;
 import persistence.gamestate.visitor.Visitor;

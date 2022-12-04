@@ -2,7 +2,7 @@ package persistence.gamestate.visitor;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
-import starships.game.LiveGame;
+import game.LiveGame;
 import starships.entities.Asteroid;
 import starships.entities.bullet.Bullet;
 import starships.entities.ship.Ship;
