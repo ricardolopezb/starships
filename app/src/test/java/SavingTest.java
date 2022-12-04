@@ -1,16 +1,3 @@
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
-import org.junit.Assert;
-import org.junit.Test;
-import persistence.gamestate.GameStateSaver;
-import persistence.gamestate.ShipJsonReader;
-import persistence.gamestate.visitor.JSONWriteVisitor;
-import persistence.gamestate.visitor.Visitor;
-import starships.GameState;
-import starships.entities.ship.Ship;
-
-import java.io.IOException;
-
 public class SavingTest {
 
 //    @Test

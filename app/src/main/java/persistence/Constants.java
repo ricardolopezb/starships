@@ -8,13 +8,13 @@ public class Constants {
     public static final Integer LASER_WEAPON_BULLETS_PER_SHOT = 2;
     public static final Double LASER_WEAPON_SHOT_SPEED = 5.0;
     public static final Integer EXPLOSIVE_WEAPON_BULLETS_PER_SHOT = 4;
-    public static final Double EXPLOSIVE_WEAPON_SHOT_SPEED = 2.0;
+    public static final Double EXPLOSIVE_WEAPON_SHOT_SPEED = 1.5;
 
 
     public static final Double ASTEROID_SPEED = 1.1; //1.2
     public static final Double SHIP_ACCELERATION_COEFFICIENT = 0.5;
     public static final Double SHIP_BRAKE_COEFFICIENT = -0.4;
-    public static final Integer SHIP_ROTATION_DEGREES = 20;
+    public static final Integer SHIP_ROTATION_DEGREES = 25;
 
 
     public static final Double ASTEROID_SPAWN_RATE = 0.003; //0.001

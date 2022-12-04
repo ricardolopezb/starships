@@ -2,7 +2,7 @@ package persistence.gamestate.visitor;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
-import starships.GameState;
+import starships.game.LiveGame;
 import starships.entities.Asteroid;
 import starships.entities.bullet.Bullet;
 import starships.entities.ship.Ship;
@@ -51,7 +51,7 @@ public class JSONWriteVisitor implements Visitor<JSONObject> {
     }
 
     @Override
-    public JSONObject visitGameState(GameState gameState) {
+    public JSONObject visitGameState(LiveGame gameState) {
         JSONObject saveObj = new JSONObject();
         saveObj.put("scores", gameState.getScores());
         saveObj.put("removedIds", gameState.getRemovedIds());
@@ -69,12 +69,12 @@ public class JSONWriteVisitor implements Visitor<JSONObject> {
 
 
     @NotNull
-    private List<Object> getMoversJsons(GameState gameState) {
+    private List<Object> getMoversJsons(LiveGame gameState) {
         return gameState.getMovingEntities().stream().map(mover -> mover.accept(this)).toList();
     }
 
     @NotNull
-    private List<JSONObject> getShipControllersJsons(GameState gameState) {
+    private List<JSONObject> getShipControllersJsons(LiveGame gameState) {
         return gameState.getShips().stream().map(shipController -> shipController.accept(this)).toList();
     }
 

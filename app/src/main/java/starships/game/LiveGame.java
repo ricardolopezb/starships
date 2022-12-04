@@ -1,4 +1,4 @@
-package starships;
+package starships.game;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.parser.ParseException;
@@ -6,6 +6,7 @@ import persistence.gamestate.visitor.Visitable;
 import persistence.gamestate.visitor.Visitor;
 import starships.entities.Asteroid;
 import starships.entities.BaseEntity;
+import starships.entities.EntityType;
 import starships.entities.bullet.Bullet;
 import starships.entities.ship.ShipController;
 import starships.entities.weapon.WeaponType;
@@ -20,7 +21,7 @@ import starships.utils.ScoreDTO;
 import java.io.IOException;
 import java.util.*;
 
-public class GameState implements Visitable {
+public class LiveGame implements GameState {
 
     private final List<Mover> movingEntities;
     private final List<ShipController> ships;
@@ -29,7 +30,7 @@ public class GameState implements Visitable {
     private final Boolean validState;
 
 
-    public GameState(List<Mover> movingEntities, List<ShipController> ships, List<String> removedIds, Map<String, Integer> scores) {
+    public LiveGame(List<Mover> movingEntities, List<ShipController> ships, List<String> removedIds, Map<String, Integer> scores) {
         this.movingEntities = movingEntities;
         this.ships = ships;
         this.scores = scores;
@@ -37,7 +38,7 @@ public class GameState implements Visitable {
         this.validState = true;
     }
 
-    public GameState(){
+    public LiveGame(){
         this.movingEntities = new ArrayList<>();
         this.ships = new ArrayList<>();
         this.scores = new HashMap<>();
@@ -51,7 +52,7 @@ public class GameState implements Visitable {
         if(foundShip.isPresent()){
             ShipController acceleratedShip = foundShip.get().accelerate(coef);
             List<ShipController> newList = replaceShip(this.ships, foundShip.get(), acceleratedShip);
-            return new GameState(this.movingEntities, newList, this.removedIds, scores);
+            return new LiveGame(this.movingEntities, newList, this.removedIds, scores);
         } else {
             return this;
         }
@@ -64,7 +65,7 @@ public class GameState implements Visitable {
         if(foundShip.isPresent()){
             ShipController acceleratedShip = foundShip.get().rotate(degrees);
             List<ShipController> newList = replaceShip(this.ships, foundShip.get(), acceleratedShip);
-            return new GameState(this.movingEntities, newList, this.removedIds, scores);
+            return new LiveGame(this.movingEntities, newList, this.removedIds, scores);
         } else {
             return this;
         }
@@ -81,7 +82,7 @@ public class GameState implements Visitable {
         Optional<BaseEntity> collidedElement1 = collideElements(element1.get(), element2.get());
         Optional<BaseEntity> collidedElement2 = collideElements(element2.get(), element1.get());
         insertCollidedElementsInLists(shipsCopy, moversCopy, removedIdsCopy, element1, element2, collidedElement1, collidedElement2);
-        return new GameState(moversCopy, shipsCopy, removedIdsCopy, newScores);
+        return new LiveGame(moversCopy, shipsCopy, removedIdsCopy, newScores);
 
     }
 
@@ -101,7 +102,7 @@ public class GameState implements Visitable {
         } else {
             newShips = resetShipPosition(elementId, newShips);
         }
-        return new GameState(moverList, newShips, newRemovedIds, this.scores);
+        return new LiveGame(moverList, newShips, newRemovedIds, this.scores);
     }
 
     private List<ShipController> resetShipPosition(String elementId, List<ShipController> newShips) {
@@ -120,7 +121,7 @@ public class GameState implements Visitable {
             WeaponType nextWeapon = getNextWeapon(foundShip.get().getWeapon().getWeaponType());
             ShipController changedWeaponShip = foundShip.get().changeWeapon(nextWeapon);
             List<ShipController> newList = replaceShip(this.ships, foundShip.get(), changedWeaponShip);
-            return new GameState(this.movingEntities, newList, this.removedIds, scores);
+            return new LiveGame(this.movingEntities, newList, this.removedIds, scores);
         } else {
             return this;
         }
@@ -254,14 +255,23 @@ public class GameState implements Visitable {
 
     public GameState shoot(String shipId){
         Optional<ShipController> foundShip = findShip(shipId);
-        if(foundShip.isPresent()){
+        if(foundShip.isPresent() && movingBulletQuantity() < 70){
             List<Mover<Bullet>> shotBullets = foundShip.get().shoot();
             List<Mover> newMovers = new ArrayList<>(this.movingEntities);
             newMovers.addAll(shotBullets);
-            return new GameState(newMovers, this.ships, this.removedIds,this.scores);
+            return new LiveGame(newMovers, this.ships, this.removedIds,this.scores);
         } else {
             return this;
         }
+    }
+
+    private int movingBulletQuantity() {
+        int count = 0;
+        for (Mover movingEntity : movingEntities) {
+            if (movingEntity.getEntity().getEntityType() == EntityType.BULLET)
+                count++;
+        }
+        return count;
     }
 
     private Optional<ShipController> findShip(String shipId){
@@ -286,7 +296,7 @@ public class GameState implements Visitable {
         List<ShipController> shipControllers = shipsInitializer.createShipControllers();
         Map<String, Integer> shipScores = initializeShipScores(shipControllers);
         List<String> removedIds = new ArrayList<>();
-        return new GameState(movers, shipControllers, removedIds, shipScores);
+        return new LiveGame(movers, shipControllers, removedIds, shipScores);
     }
 
     private static Map<String, Integer> initializeShipScores(List<ShipController> shipControllers) {
@@ -332,9 +342,24 @@ public class GameState implements Visitable {
             ShipController stoppingShip = stoppingShipOpt.get();
             ShipController stoppedShip = stoppingShip.stop();
             List<ShipController> newShips = replaceShip(this.ships, stoppingShip, stoppedShip);
-            return new GameState(this.movingEntities, newShips, this.removedIds, this.scores);
+            return new LiveGame(this.movingEntities, newShips, this.removedIds, this.scores);
         }
         return this;
+    }
+
+    @Override
+    public GameState pause() {
+        return new PausedGame(this);
+    }
+
+    @Override
+    public GameState unpause() {
+        return this;
+    }
+
+    @Override
+    public GameState getCopyWith(List<Mover> movers, List<ShipController> ships, List<String> removedIds, Map<String, Integer> scores) {
+        return new LiveGame(movers, ships, removedIds, scores);
     }
 
     @Override

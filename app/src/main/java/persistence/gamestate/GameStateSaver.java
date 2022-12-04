@@ -6,7 +6,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import persistence.Constants;
 import persistence.gamestate.visitor.JSONWriteVisitor;
-import starships.GameState;
+import starships.game.GameState;
+import starships.game.LiveGame;
 import starships.entities.ship.ShipController;
 import starships.movement.Mover;
 
@@ -26,7 +27,7 @@ public class GameStateSaver {
     }
 
     public GameState startNewGame() throws IOException, ParseException {
-        return GameState.newGame();
+        return LiveGame.newGame();
     }
 
     public GameState loadGameState() {
@@ -45,7 +46,7 @@ public class GameStateSaver {
 
         List<ShipController> shipControllers = readShipControllers(saveJson);
         List<Mover> movingEntities = readMovingEntities(saveJson);
-        return new GameState(movingEntities, shipControllers, removedIds, scores);
+        return new LiveGame(movingEntities, shipControllers, removedIds, scores);
 
     }
 

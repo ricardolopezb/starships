@@ -3,9 +3,9 @@ package edu.austral.ingsis.starships
 import edu.austral.ingsis.starships.ui.*
 import javafx.application.Application
 import javafx.application.Application.launch
-import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.ObservableMap
 import javafx.event.EventHandler
+import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.input.KeyCode
 import javafx.scene.layout.StackPane
@@ -14,22 +14,20 @@ import javafx.stage.Stage
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
-import starships.GameState
+import starships.game.LiveGame
 import starships.entities.ship.ShipController
 import starships.entities.BaseEntity
 import starships.movement.Mover
 import persistence.Constants
 import persistence.gamestate.GameStateSaver
 import persistence.WindowConfigurator
-import java.awt.Button
-import java.awt.Label
+import starships.game.GameState
 import java.io.FileReader
-import java.util.ListResourceBundle
 
 fun main() {
     launch(Starships::class.java)
 }
-private var gameState = GameState()
+private var gameState: GameState = LiveGame()
 class Starships() : Application() {
     private val imageResolver = CachedImageResolver(DefaultImageResolver())
     private val facade = ElementsViewFacade(imageResolver)
@@ -48,12 +46,43 @@ class Starships() : Application() {
         primaryStage.scene = startScene
         val entityInSceneManager = EntityInSceneManager(facade)
         addEventListeners(entityInSceneManager, primaryStage, gameInitializer)
+
+        //val generalPane = buildGeneralPane()
+        //gameScene = Scene(generalPane)
         gameScene = Scene(facade.view)
         facade.view.id = "facade"
         gameScene.stylesheets.add(this::class.java.classLoader.getResource("gameStyles.css")?.toString())
         keyTracker.scene = gameScene
         setUpPrimaryStage(primaryStage, startScene)
         startApplicationComponents(primaryStage)
+    }
+
+    private fun buildGeneralPane(): StackPane {
+        val generalPane = StackPane()
+
+        val livesLayout = buildLivesLayout()
+        val scoreLayout = buildScoresLayout()
+
+        generalPane.children.addAll(facade.view, livesLayout, scoreLayout)
+        return generalPane
+
+    }
+
+    private fun buildLivesLayout(): VBox {
+        val livesLayout = VBox()
+        livesLayout.alignment = Pos.TOP_LEFT
+        val life1 = javafx.scene.control.Label("life 1")
+        val life2 = javafx.scene.control.Label("life 2")
+        livesLayout.children.addAll(life1, life2)
+        return livesLayout
+    }
+    private fun buildScoresLayout(): VBox {
+        val scoreLayout = VBox()
+        scoreLayout.alignment = Pos.TOP_RIGHT
+        val score1 = javafx.scene.control.Label("score 1")
+        val score2 = javafx.scene.control.Label("score 2")
+        scoreLayout.children.addAll(score1, score2)
+        return scoreLayout
     }
 
     private fun cleanFacade() {
@@ -160,7 +189,7 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
 
 
     override fun handle(event: TimePassed) {
-        if (Starships.paused) return
+        //if (Starships.paused) return
         val newShipList = ArrayList<ShipController>()
         val newMoverList = ArrayList<Mover<BaseEntity>>()
         if(startingShips > 1) checkMultiplayerVictory()
@@ -170,7 +199,7 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
         spawnAsteroid(newMoverList)
         updateMovingEntities(newMoverList)
 
-        gameState = GameState(newMoverList, newShipList, gameState.removedIds, gameState.scores)
+        gameState = gameState.getCopyWith(newMoverList, newShipList, gameState.removedIds, gameState.scores)
     }
 
     private fun checkGameOver() {
@@ -213,8 +242,17 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
         }
     }
 
-    private fun spawnAsteroid(newMoverList: ArrayList<Mover<BaseEntity>>) {
-        if (Math.random() <= Constants.ASTEROID_SPAWN_RATE) {
+    private fun spawnAsteroid(newMoverList: ArrayList<Mover<BaseEntity>>){
+        val shouldSpawnAsteroid = evaluateAsteroidSpawnLogic()
+        spawnAsteroid(newMoverList, shouldSpawnAsteroid)
+    }
+
+    private fun evaluateAsteroidSpawnLogic(): Boolean {
+        return Math.random() <= Constants.ASTEROID_SPAWN_RATE
+    }
+
+    private fun spawnAsteroid(newMoverList: ArrayList<Mover<BaseEntity>>, shouldSpawnAsteroid: Boolean) {
+        if (shouldSpawnAsteroid) {
             val asteroidMover = gameState.spawnAsteroid()
             newMoverList.add(asteroidMover as Mover<BaseEntity>)
         }
@@ -298,7 +336,8 @@ class KeyPressedListener(val gameSaver: GameStateSaver): EventListener<KeyPresse
             keyCodeMap["rotate_counterclockwise"] -> gameState = gameState.rotateShip(shipId, -Constants.SHIP_ROTATION_DEGREES)
             keyCodeMap["shoot"] -> gameState = gameState.shoot(shipId)
             keyCodeMap["change_weapon"] -> gameState = gameState.changeWeapon(shipId)
-            keyCodeMap["pause"] -> Starships.paused = !Starships.paused
+            //keyCodeMap["pause"] -> Starships.paused = !Starships.paused
+            keyCodeMap["pause"] -> gameState = gameState.pause()
             keyCodeMap["save"] -> gameSaver.saveGameState(gameState)
             else -> {}
         }
@@ -379,7 +418,7 @@ class GameInitializer(val gameSaver: GameStateSaver){
         NEW, LOAD
     }
 
-    fun selectGameStart(selectedStartMode: GameStart): GameState{
+    fun selectGameStart(selectedStartMode: GameStart): GameState {
         return when(selectedStartMode){
             GameStart.NEW -> startNewGame()
             GameStart.LOAD -> loadGame()
