@@ -24,6 +24,7 @@ import persistence.WindowConfigurator
 import game.GameState
 import game.actions.Action
 import game.actions.ActionMapper
+import javafx.scene.Group
 import java.io.FileReader
 
 fun main() {
@@ -37,9 +38,7 @@ class Starships() : Application() {
     private val gameSaver = GameStateSaver()
     var gameScene = Scene(StackPane())
     var startScene = Scene(StackPane())
-    companion object Paused {
-        var paused = false
-    }
+
 
     override fun start(primaryStage: Stage) {
         cleanFacade()
@@ -52,11 +51,15 @@ class Starships() : Application() {
         //val generalPane = buildGeneralPane()
         //gameScene = Scene(generalPane)
         gameScene = Scene(facade.view)
-        facade.view.id = "facade"
-        gameScene.stylesheets.add(this::class.java.classLoader.getResource("gameStyles.css")?.toString())
+        addCssToFacade()
         keyTracker.scene = gameScene
         setUpPrimaryStage(primaryStage, startScene)
         startApplicationComponents(primaryStage)
+    }
+
+    private fun addCssToFacade() {
+        facade.view.id = "facade"
+        gameScene.stylesheets.add(this::class.java.classLoader.getResource("gameStyles.css")?.toString())
     }
 
     private fun buildGeneralPane(): StackPane {
@@ -138,7 +141,7 @@ class Starships() : Application() {
 
     private fun addEventListeners(entityInSceneManager: EntityInSceneManager, primaryStage: Stage, gameInitializer: GameInitializer) {
         val gameFinishedListener = GameFinishedListener(primaryStage, startScene, gameInitializer)
-        facade.timeListenable.addEventListener(TimeListener(facade.elements, entityInSceneManager, Paused, gameFinishedListener))
+        facade.timeListenable.addEventListener(TimeListener(facade.elements, entityInSceneManager, gameFinishedListener))
         facade.collisionsListenable.addEventListener(CollisionListener())
         facade.outOfBoundsListenable.addEventListener(OutOfBoundsListener())
         facade.reachBoundsListenable.addEventListener(ReachBoundsListener())
@@ -174,7 +177,6 @@ class EntityInSceneManager(private val facade: ElementsViewFacade){
 
 class TimeListener(private val elements: ObservableMap<String, ElementModel>,
                    private val inserter: EntityInSceneManager,
-                   private var paused: Starships.Paused,
                    private val gameFinishedListener: GameFinishedListener
 
                    ) : EventListener<TimePassed> {
@@ -188,10 +190,7 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
     }
 
 
-
-
     override fun handle(event: TimePassed) {
-        //if (Starships.paused) return
         val newShipList = ArrayList<ShipController>()
         val newMoverList = ArrayList<Mover<BaseEntity>>()
         if(startingShips > 1) checkMultiplayerVictory()
