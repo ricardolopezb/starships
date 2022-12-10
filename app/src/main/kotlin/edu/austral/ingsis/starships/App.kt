@@ -48,8 +48,10 @@ class Starships() : Application() {
         val entityInSceneManager = EntityInSceneManager(facade)
         addEventListeners(entityInSceneManager, primaryStage, gameInitializer)
 
-        //val generalPane = buildGeneralPane()
-        //gameScene = Scene(generalPane)
+//        val generalPane = buildGeneralPane()
+//
+//        gameScene = Scene(generalPane)
+
         gameScene = Scene(facade.view)
         addCssToFacade()
         keyTracker.scene = gameScene
@@ -97,27 +99,21 @@ class Starships() : Application() {
 
     fun generateStartScene(primaryStage: Stage, gameInitializer: GameInitializer): Scene {
         val gameTitle = javafx.scene.control.Label("Starships")
-        val newGameButton = createNewGameButton(gameInitializer, primaryStage)
-        val loadGameButton = createLoadGameButton(gameInitializer, primaryStage)
+        primaryStage.title = "Starships"
+        val newGameButton = createGameStartButton(gameInitializer, primaryStage, GameInitializer.GameStart.NEW, "New Game")
+        val loadGameButton = createGameStartButton(gameInitializer, primaryStage, GameInitializer.GameStart.LOAD, "Load Game")
         val layout = VBox()
         layout.children.addAll(gameTitle, newGameButton, loadGameButton)
         return Scene(layout)
     }
 
-    private fun createNewGameButton(gameInitializer: GameInitializer, primaryStage: Stage): javafx.scene.control.Button {
-        val newGameButton = javafx.scene.control.Button("New Game")
-        newGameButton.onAction = EventHandler {
-            startGameScene(gameInitializer, primaryStage, GameInitializer.GameStart.NEW)
-        }
-        return newGameButton
-    }
 
-    private fun createLoadGameButton(gameInitializer: GameInitializer, primaryStage: Stage): javafx.scene.control.Button {
-        val loadGameButton = javafx.scene.control.Button("Load Game")
-        loadGameButton.onAction = EventHandler {
-            startGameScene(gameInitializer, primaryStage, GameInitializer.GameStart.LOAD)
+    private fun createGameStartButton(gameInitializer: GameInitializer, primaryStage: Stage, gameStart: GameInitializer.GameStart, message: String) : javafx.scene.control.Button{
+        val button = javafx.scene.control.Button(message)
+        button.onAction = EventHandler {
+            startGameScene(gameInitializer, primaryStage, gameStart)
         }
-        return loadGameButton
+        return button
     }
 
     private fun startGameScene(gameInitializer: GameInitializer, primaryStage: Stage, gameStart: GameInitializer.GameStart) {
@@ -233,8 +229,8 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
                 elements[it.id]?.y?.set(updatedMoverElementModel.y.value)
                 if(it.id.startsWith("Asteroid"))
                     elements[it.id]?.rotationInDegrees?.set(elements[it.id]?.rotationInDegrees!!.value + 1)
-                    elements[it.id]?.height?.set(elements[it.id]?.height!!.value)
-                    elements[it.id]?.width?.set(elements[it.id]?.width!!.value)
+                    elements[it.id]?.height?.set(updatedMoverElementModel.height.value)
+                    elements[it.id]?.width?.set(updatedMoverElementModel.width.value)
             } else {
                 inserter.insert(updatedMoverElementModel)
                 //elements[updatedMoverElementModel.id] = updatedMoverElementModel

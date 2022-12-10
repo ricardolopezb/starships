@@ -20,8 +20,6 @@ public class AsteroidSpawner {
 
     public AsteroidSpawner() {
         WindowConfigurator wc = WindowConfigurator.getInstance();
-
-
         this.maxX = getIntegerPropertyValueWithDefault(wc, "width", 950);
         this.maxY = getIntegerPropertyValueWithDefault(wc, "height", 800);
     }
@@ -33,7 +31,7 @@ public class AsteroidSpawner {
     public Mover<Asteroid> spawnAsteroid(Position targetShipPosition){
         Side randomSide = getRandomSide();
         return switch (randomSide) {
-            case TOP -> spawnInCoordinates(getRandomNumber(0, maxX), 0+70, targetShipPosition);
+            case TOP -> spawnInCoordinates(getRandomNumber(0, maxX), 0+10, targetShipPosition);
             case BOTTOM -> spawnInCoordinates(getRandomNumber(0, maxX), maxY-10, targetShipPosition);
             case LEFT -> spawnInCoordinates(0+10, getRandomNumber(0, maxY), targetShipPosition);
             case RIGHT -> spawnInCoordinates(maxX-10, getRandomNumber(0, maxY), targetShipPosition);
@@ -60,7 +58,7 @@ public class AsteroidSpawner {
         return generateMovementVector(x, y, targetShipPosition);
     }
 
-    private static Vector generateMovementVector(Integer x, Integer y, Position targetShipPosition) {
+    private Vector generateMovementVector(Integer x, Integer y, Position targetShipPosition) {
         return new Vector((double) (targetShipPosition.getX() - x), (double) (targetShipPosition.getY() - y)).normalize().multiply(Constants.ASTEROID_SPEED);
     }
 

@@ -31,6 +31,7 @@ public class WindowConfigurator {
         return result != null ? Optional.of(result) : Optional.empty();
     }
 
+
     public static WindowConfigurator getInstance(){
         return instance;
     }
