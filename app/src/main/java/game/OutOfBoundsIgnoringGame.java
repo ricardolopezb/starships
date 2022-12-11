@@ -8,6 +8,12 @@ import starships.movement.Mover;
 import java.util.List;
 import java.util.Map;
 
+/** GameState class intended to be used in initial game loading due to lazy
+ * JavaFX Node layout bounds computation causing errors in OutOfBounds event triggering.
+ *
+ * It serves to ignore first loading entities from being applied the OutOfBounds event handling.
+ */
+
 public class OutOfBoundsIgnoringGame implements GameState{
     private final GameState liveGame;
     private final Integer savedEntitiesQuantity;
