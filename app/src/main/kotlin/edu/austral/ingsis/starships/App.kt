@@ -24,8 +24,9 @@ import persistence.WindowConfigurator
 import game.GameState
 import game.actions.Action
 import game.actions.ActionMapper
-import javafx.scene.Group
+import javafx.scene.control.Label
 import java.io.FileReader
+import java.util.Arrays
 
 fun main() {
     launch(Starships::class.java)
@@ -46,9 +47,10 @@ class Starships() : Application() {
         startScene = generateStartScene(primaryStage, gameInitializer)
         primaryStage.scene = startScene
         val entityInSceneManager = EntityInSceneManager(facade)
-        addEventListeners(entityInSceneManager, primaryStage, gameInitializer)
 
-        val generalPane = buildGeneralPane()
+
+        val (generalPane, lifeLabels, scoreLabels) = buildGeneralPane()
+        addEventListeners(entityInSceneManager, primaryStage, gameInitializer, lifeLabels[0])
         gameScene = Scene(generalPane, 950.0, 800.0)
 
         //gameScene = Scene(facade.view)
@@ -63,36 +65,46 @@ class Starships() : Application() {
         gameScene.stylesheets.add(this::class.java.classLoader.getResource("gameStyles.css")?.toString())
     }
 
-    private fun buildGeneralPane(): StackPane {
+    private fun buildGeneralPane(): Triple<StackPane, List<Label>, List<Label>> {
         val generalPane = StackPane()
 
-        val livesLayout = buildLivesLayout()
-        val scoreLayout = buildScoresLayout()
+        val (livesLayout, lifeLabels) = buildLivesLayout()
+        val (scoreLayout, scoreLabels) = buildScoresLayout()
 
         generalPane.children.addAll(facade.view, livesLayout, scoreLayout)
-        return generalPane
+        return Triple(generalPane, lifeLabels, scoreLabels)
 
     }
 
-    private fun buildLivesLayout(): VBox {
-        val livesLayout = VBox()
-        livesLayout.alignment = Pos.TOP_LEFT
-        val life1 = javafx.scene.control.Label("life 1")
-        val life2 = javafx.scene.control.Label("life 2")
-        livesLayout.children.addAll(life1, life2)
-        return livesLayout
+    private fun buildLivesLayout(): Pair<VBox, List<Label>> {
+        return buildVerticalPlayerDataLabelLayout(Pos.TOP_LEFT)
     }
-    private fun buildScoresLayout(): VBox {
-        val scoreLayout = VBox()
-        scoreLayout.alignment = Pos.TOP_RIGHT
-        val score1 = javafx.scene.control.Label("score 1")
-        val score2 = javafx.scene.control.Label("score 2")
-        scoreLayout.children.addAll(score1, score2)
-        return scoreLayout
+    private fun buildScoresLayout(): Pair<VBox, List<Label>> {
+//        val scoreLayout = VBox()
+//        scoreLayout.alignment = Pos.TOP_RIGHT
+//        val score1 = javafx.scene.control.Label("score 1")
+//        val score2 = javafx.scene.control.Label("score 2")
+//        scoreLayout.children.addAll(score1, score2)
+//        return scoreLayout
+        return buildVerticalPlayerDataLabelLayout(Pos.TOP_RIGHT)
     }
+
+    private fun buildVerticalPlayerDataLabelLayout(position: Pos): Pair<VBox, List<Label>> {
+        val verticalLayout = VBox()
+        verticalLayout.alignment = position
+        val playerQuantity = getPlayerQuantity()
+        val labelList = ArrayList<Label>();
+        repeat(playerQuantity) {index ->
+            labelList.add(Label("Player " + (index+1) + ": "))
+        }
+        verticalLayout.children.addAll(labelList)
+
+        return verticalLayout to labelList
+    }
+    private fun getPlayerQuantity() : Int = (WindowConfigurator.getInstance().getProperty("players").get() as Long).toInt()
 
     private fun cleanFacade() {
-        facade.showCollider.value = true
+        facade.showCollider.value = false
         facade.showGrid.value = false
     }
 
@@ -134,10 +146,10 @@ class Starships() : Application() {
         primaryStage.width = (windowConfigurator.getProperty("width").get() as Long).toDouble()
     }
 
-    private fun addEventListeners(entityInSceneManager: EntityInSceneManager, primaryStage: Stage, gameInitializer: GameInitializer) {
+    private fun addEventListeners(entityInSceneManager: EntityInSceneManager, primaryStage: Stage, gameInitializer: GameInitializer, lifeLabel: Label) {
         val gameFinishedListener = GameFinishedListener(primaryStage, startScene, gameInitializer)
         val outOfBoundsListener = OutOfBoundsListener()
-        facade.timeListenable.addEventListener(TimeListener(facade.elements, entityInSceneManager, gameFinishedListener, facade))
+        facade.timeListenable.addEventListener(TimeListener(facade.elements, entityInSceneManager, gameFinishedListener, facade, lifeLabel))
         facade.collisionsListenable.addEventListener(CollisionListener())
         facade.outOfBoundsListenable.addEventListener(outOfBoundsListener)
         facade.reachBoundsListenable.addEventListener(ReachBoundsListener())
@@ -176,9 +188,10 @@ class EntityInSceneManager(private val facade: ElementsViewFacade){
 class TimeListener(private val elements: ObservableMap<String, ElementModel>,
                    private val inserter: EntityInSceneManager,
                    private val gameFinishedListener: GameFinishedListener,
-                   private val facade: ElementsViewFacade
+                   private val facade: ElementsViewFacade,
+                   private var lifeLabel: Label
 
-                   ) : EventListener<TimePassed> {
+) : EventListener<TimePassed> {
     private val startingShips = (WindowConfigurator.getInstance().getProperty("players").get() as Long).toInt()
     private val gameFinishedEmitter = createGameFinishedEmitter(gameFinishedListener)
 
@@ -255,6 +268,7 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
     private fun spawnAsteroid(newMoverList: ArrayList<Mover<BaseEntity>>, shouldSpawnAsteroid: Boolean) {
         if (shouldSpawnAsteroid) {
             val asteroidMover = gameState.spawnAsteroid()
+            lifeLabel.text = lifeLabel.text + "a"
             newMoverList.add(asteroidMover as Mover<BaseEntity>)
         }
     }

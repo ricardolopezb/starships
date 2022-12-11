@@ -92,7 +92,6 @@ public class LiveGame implements GameState {
     }
 
     public GameState handleOutOfBounds(String elementId){
-        System.out.println("OUT OF BOUNDS MAMAWEBO");
         List<Mover> moverList = new ArrayList<>(this.movingEntities);
         List<String> newRemovedIds = new ArrayList<>(this.removedIds);
         List<ShipController> newShips = new ArrayList<>(this.ships);

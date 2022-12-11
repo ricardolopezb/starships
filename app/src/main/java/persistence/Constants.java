@@ -27,7 +27,7 @@ public class Constants {
 
 
     public static final Integer SHIP_SPAWN_POSITION_OFFSET = 70;
-    public static final Integer STARTING_X_COORD = 300;
-    public static final Integer STARTING_Y_COORD = 300;
+    public static final Integer STARTING_X_COORD = 200;
+    public static final Integer STARTING_Y_COORD = 150;
     public static final String SAVE_FILE_PATH = System.getProperty("user.dir") + "/app/src/main/java/persistence/files/save_file.json";;
 }

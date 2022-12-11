@@ -55,7 +55,6 @@ public class OutOfBoundsIgnoringGame implements GameState{
     @Override
     public GameState handleOutOfBounds(String elementId) {
         if(handledEntitySpawnings == savedEntitiesQuantity){
-            System.out.println("STOPPED BEING OUT OF BOUNDS IGNORER");
             return liveGame;
         } else {
             return new OutOfBoundsIgnoringGame(liveGame, savedEntitiesQuantity, handledEntitySpawnings+1);
