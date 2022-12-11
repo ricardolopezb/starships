@@ -1,5 +1,6 @@
 package persistence.gamestate;
 
+import game.OutOfBoundsIgnoringGame;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -46,8 +47,11 @@ public class GameStateSaver {
 
         List<ShipController> shipControllers = readShipControllers(saveJson);
         List<Mover> movingEntities = readMovingEntities(saveJson);
-        return new LiveGame(movingEntities, shipControllers, removedIds, scores);
-
+        //return new LiveGame(movingEntities, shipControllers, removedIds, scores);
+        return new OutOfBoundsIgnoringGame(
+                new LiveGame(movingEntities, shipControllers, removedIds, scores),
+                movingEntities.size()+shipControllers.size()
+                );
     }
 
     private Map<String, Integer> readScores(JSONObject object) {

@@ -412,7 +412,7 @@ class GameFinishedListener(val primaryStage: Stage, val startScene: Scene, val g
 class OutOfBoundsListener() : EventListener<OutOfBounds> {
     var active = false
     override fun handle(event: OutOfBounds) {
-        //gameState = gameState.handleOutOfBounds(event.id)
+        gameState = gameState.handleOutOfBounds(event.id)
     }
 
     fun activateListening() {
