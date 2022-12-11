@@ -26,7 +26,6 @@ import game.actions.Action
 import game.actions.ActionMapper
 import javafx.scene.control.Label
 import java.io.FileReader
-import java.util.Arrays
 
 fun main() {
     launch(Starships::class.java)
@@ -50,7 +49,7 @@ class Starships() : Application() {
 
 
         val (generalPane, lifeLabels, scoreLabels) = buildGeneralPane()
-        addEventListeners(entityInSceneManager, primaryStage, gameInitializer, lifeLabels[0])
+        addEventListeners(entityInSceneManager, primaryStage, gameInitializer, lifeLabels, scoreLabels)
         gameScene = Scene(generalPane, 950.0, 800.0)
 
         //gameScene = Scene(facade.view)
@@ -146,10 +145,10 @@ class Starships() : Application() {
         primaryStage.width = (windowConfigurator.getProperty("width").get() as Long).toDouble()
     }
 
-    private fun addEventListeners(entityInSceneManager: EntityInSceneManager, primaryStage: Stage, gameInitializer: GameInitializer, lifeLabel: Label) {
+    private fun addEventListeners(entityInSceneManager: EntityInSceneManager, primaryStage: Stage, gameInitializer: GameInitializer, lifeLabels: List<Label>, scoreLabels: List<Label>) {
         val gameFinishedListener = GameFinishedListener(primaryStage, startScene, gameInitializer)
         val outOfBoundsListener = OutOfBoundsListener()
-        facade.timeListenable.addEventListener(TimeListener(facade.elements, entityInSceneManager, gameFinishedListener, facade, lifeLabel))
+        facade.timeListenable.addEventListener(TimeListener(facade.elements, entityInSceneManager, gameFinishedListener, facade, lifeLabels, scoreLabels))
         facade.collisionsListenable.addEventListener(CollisionListener())
         facade.outOfBoundsListenable.addEventListener(outOfBoundsListener)
         facade.reachBoundsListenable.addEventListener(ReachBoundsListener())
@@ -189,7 +188,8 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
                    private val inserter: EntityInSceneManager,
                    private val gameFinishedListener: GameFinishedListener,
                    private val facade: ElementsViewFacade,
-                   private var lifeLabel: Label
+                   private var lifeLabels: List<Label>,
+                   private var scoreLabels: List<Label>
 
 ) : EventListener<TimePassed> {
     private val startingShips = (WindowConfigurator.getInstance().getProperty("players").get() as Long).toInt()
@@ -212,8 +212,16 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
         removeIdsInScene()
         spawnAsteroid(newMoverList)
         updateMovingEntities(newMoverList)
+        updateLabels()
 
         gameState = gameState.getCopyWith(newMoverList, newShipList, gameState.removedIds, gameState.scores)
+    }
+
+    private fun updateLabels() {
+        gameState.scores.forEach {
+            val shipNumber = it.key.drop(5).toInt()
+            scoreLabels.get(shipNumber-1).text = "Player ${(shipNumber-1)}: " + it.value
+        }
     }
 
     private fun checkGameOver() {
@@ -235,6 +243,7 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
             gameFinishedEmitter.emit(GameEnding("WIN", gameState.ships[0].id.drop(5)))
         }
     }
+
 
     private fun updateMovingEntities(newMoverList: ArrayList<Mover<BaseEntity>>) {
         gameState.movingEntities.forEach {
@@ -268,7 +277,6 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
     private fun spawnAsteroid(newMoverList: ArrayList<Mover<BaseEntity>>, shouldSpawnAsteroid: Boolean) {
         if (shouldSpawnAsteroid) {
             val asteroidMover = gameState.spawnAsteroid()
-            lifeLabel.text = lifeLabel.text + "a"
             newMoverList.add(asteroidMover as Mover<BaseEntity>)
         }
     }
