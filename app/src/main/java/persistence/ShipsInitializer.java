@@ -57,7 +57,7 @@ public class ShipsInitializer {
     private static ShipMover createShipMover(String shipSkin, Integer shipHealth, Integer shipIdNumber, Integer offset) {
         Mover<Ship> mover = new Mover<>(
                 new Ship("Ship-"+shipIdNumber, shipHealth, shipSkin),
-                new Position(Constants.STARTING_X_COORD+offset, Constants.STARTING_Y_COORD),
+                new Position(Constants.STARTING_X_COORD+offset, Constants.STARTING_Y_COORD+offset),
                 new Vector(0D,0D),
                 new Vector(0D),
                 new StarshipUIAdapter()

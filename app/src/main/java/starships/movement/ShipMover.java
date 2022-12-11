@@ -72,9 +72,19 @@ public class ShipMover implements Visitable {
         return this.mover.getAdapter();
     }
 
-    public ShipMover resetPosition() {
-        Mover<Ship> newMover = new Mover<>(mover.getEntity(), new Position(Constants.STARTING_X_COORD, Constants.STARTING_Y_COORD), new Vector(0.0, 0.0), mover.getFacingDirection(), mover.getAdapter());
+    public ShipMover resetToInitialPosition() {
+        Position initialPosition = getInitialPosition();
+        //Mover<Ship> newMover = new Mover<>(mover.getEntity(), new Position(Constants.STARTING_X_COORD, Constants.STARTING_Y_COORD), new Vector(0.0, 0.0), mover.getFacingDirection(), mover.getAdapter());
+        Mover<Ship> newMover = new Mover<>(mover.getEntity(), initialPosition, new Vector(0.0, 0.0), mover.getFacingDirection(), mover.getAdapter());
         return new ShipMover(newMover);
+    }
+
+    private Position getInitialPosition() {
+        Integer shipNumber = Integer.valueOf(this.mover.getEntity().getId().substring(5));
+        return new Position(
+                Constants.STARTING_X_COORD + shipNumber*Constants.SHIP_SPAWN_POSITION_OFFSET,
+                Constants.STARTING_Y_COORD + shipNumber*Constants.SHIP_SPAWN_POSITION_OFFSET
+                );
     }
 
     @Override

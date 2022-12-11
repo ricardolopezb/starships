@@ -48,11 +48,10 @@ class Starships() : Application() {
         val entityInSceneManager = EntityInSceneManager(facade)
         addEventListeners(entityInSceneManager, primaryStage, gameInitializer)
 
-//        val generalPane = buildGeneralPane()
-//
-//        gameScene = Scene(generalPane)
+        val generalPane = buildGeneralPane()
+        gameScene = Scene(generalPane)
 
-        gameScene = Scene(facade.view)
+        //gameScene = Scene(facade.view)
         addCssToFacade()
         keyTracker.scene = gameScene
         setUpPrimaryStage(primaryStage, startScene)

@@ -72,8 +72,8 @@ public class ShipController implements Visitable {
         return new ShipController(this.shipMover.stopShip(), this.weapon);
     }
 
-    public ShipController resetPosition(){
-        return new ShipController(this.shipMover.resetPosition(), this.weapon);
+    public ShipController resetToInitialPosition(){
+        return new ShipController(this.shipMover.resetToInitialPosition(), this.weapon);
     }
 
     @Override
