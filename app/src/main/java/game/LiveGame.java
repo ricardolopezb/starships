@@ -95,12 +95,14 @@ public class LiveGame implements GameState {
         List<Mover> moverList = new ArrayList<>(this.movingEntities);
         List<String> newRemovedIds = new ArrayList<>(this.removedIds);
         List<ShipController> newShips = new ArrayList<>(this.ships);
-        if(!elementId.startsWith("Ship")){
+
+        if(elementId.startsWith("Ship")){
+            newShips = resetShipPosition(elementId, newShips);
+        } else{
             moverList = getMoversCopyWithMoverRemoved(elementId);
             newRemovedIds.add(elementId);
-        } else {
-            newShips = resetShipPosition(elementId, newShips);
         }
+
         return new LiveGame(moverList, newShips, newRemovedIds, this.scores);
     }
 
@@ -132,6 +134,7 @@ public class LiveGame implements GameState {
 
     private Map<String, Integer> addScore(Mover element1, Mover element2) {
         Map<String, Integer> newScores = new HashMap<>(this.scores);
+        if(shouldNotAddScore(element1, element2)) return newScores;
         newScores = addScoreToMover(newScores, element1.getEntity().getScore());
         newScores = addScoreToMover(newScores, element2.getEntity().getScore());
         System.out.println(newScores);
@@ -139,12 +142,26 @@ public class LiveGame implements GameState {
 
     }
 
+    private boolean shouldNotAddScore(Mover element1, Mover element2) {
+        if(element1.getEntity().getEntityType() == EntityType.BULLET && element2.getEntity().getEntityType() == EntityType.BULLET){
+            return true;
+        }
+
+        if(element1.getEntity().getEntityType() == EntityType.BULLET) {
+            return ((Bullet) element1.getEntity()).getOwnerId().equals(element2.getId());
+        }
+        if(element2.getEntity().getEntityType() == EntityType.BULLET) {
+            return ((Bullet) element2.getEntity()).getOwnerId().equals(element1.getId());
+        }
+        return false;
+    }
+
     private Map<String, Integer> addScoreToMover(Map<String, Integer> newScores, ScoreDTO score) {
         Map<String, Integer> scoreMapToAdd = new HashMap<>(newScores);
            if(newScores.containsKey(score.id())){
-            Integer value = newScores.get(score.id()).intValue();
-            scoreMapToAdd.put(score.id(), value + score.score());
-        }
+                Integer value = newScores.get(score.id()).intValue();
+                scoreMapToAdd.put(score.id(), value + score.score());
+            }
         return scoreMapToAdd;
     }
 

@@ -25,6 +25,8 @@ import game.GameState
 import game.actions.Action
 import game.actions.ActionMapper
 import javafx.scene.control.Label
+import javafx.scene.paint.Color
+import javafx.scene.text.TextAlignment
 import java.io.FileReader
 import java.util.StringJoiner
 
@@ -90,16 +92,25 @@ class Starships() : Application() {
         val labelList = ArrayList<Label>();
         labelList.add(generateLayoutTitle(layoutTitle))
         repeat(playerQuantity) {index ->
-            labelList.add(Label("Player " + (index+1) + ": "))
+            labelList.add(generateInitialPlayerLabel(index))
         }
         verticalLayout.children.addAll(labelList)
 
         return verticalLayout to labelList
     }
 
+    private fun generateInitialPlayerLabel(index: Int): Label {
+        val label = Label("Player " + (index+1) + ": ")
+        label.textFill = Color.WHITE
+        return label
+
+    }
+
     private fun generateLayoutTitle(title: String): Label {
         val layoutTitle = Label(title)
-        layoutTitle.id = "layout-title"
+        layoutTitle.textFill = Color.WHITE
+        //layoutTitle.textAlignment = TextAlignment.CENTER
+        //layoutTitle.style = "-fx-font-weight: bold;"
         return layoutTitle
     }
 
@@ -232,14 +243,14 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
     private fun updateHealthLabels() {
         gameState.ships.forEach {
             val shipNumber = it.id.drop(5).toInt()
-            lifeLabels.get(shipNumber).text = "Player ${(shipNumber-1)}: " + it.health
+            lifeLabels.get(shipNumber).text = "Player ${(shipNumber)}: " + it.health
         }
     }
 
     private fun updateScoreLabels() {
         gameState.scores.forEach {
             val shipNumber = it.key.drop(5).toInt()
-            scoreLabels.get(shipNumber).text = "Player ${(shipNumber-1)}: " + it.value
+            scoreLabels.get(shipNumber).text = "Player ${(shipNumber)}: " + it.value
         }
     }
 
