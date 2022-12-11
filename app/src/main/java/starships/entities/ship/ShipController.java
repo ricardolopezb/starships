@@ -76,6 +76,10 @@ public class ShipController implements Visitable {
         return new ShipController(this.shipMover.resetToInitialPosition(), this.weapon);
     }
 
+    public Integer getHealth(){
+        return this.shipMover.getHealth();
+    }
+
     @Override
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visitShipController(this);

@@ -5,6 +5,8 @@ import adapters.CoreEntityToUIElementAdapter;
 import persistence.gamestate.visitor.Visitable;
 import persistence.gamestate.visitor.Visitor;
 import starships.entities.BaseEntity;
+import starships.entities.EntityType;
+import starships.entities.ship.Ship;
 import starships.physics.Position;
 import starships.physics.Vector;
 
@@ -60,5 +62,9 @@ public class Mover<T extends BaseEntity> implements Visitable {
     @Override
     public <U> U accept(Visitor<U> visitor) {
         return visitor.visitMover(this);
+    }
+
+    public Integer getHealth() {
+        return this.entity.getEntityType() == EntityType.SHIP ? ((Ship) entity).getHealth() : 0;
     }
 }

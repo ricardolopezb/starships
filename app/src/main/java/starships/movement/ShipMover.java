@@ -91,4 +91,8 @@ public class ShipMover implements Visitable {
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visitShipMover(this);
     }
+
+    public Integer getHealth() {
+        return this.mover.getHealth();
+    }
 }

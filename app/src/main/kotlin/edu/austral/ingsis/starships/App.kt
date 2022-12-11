@@ -26,6 +26,7 @@ import game.actions.Action
 import game.actions.ActionMapper
 import javafx.scene.control.Label
 import java.io.FileReader
+import java.util.StringJoiner
 
 fun main() {
     launch(Starships::class.java)
@@ -76,23 +77,18 @@ class Starships() : Application() {
     }
 
     private fun buildLivesLayout(): Pair<VBox, List<Label>> {
-        return buildVerticalPlayerDataLabelLayout(Pos.TOP_LEFT)
+        return buildVerticalPlayerDataLabelLayout(Pos.TOP_LEFT, "HEALTH")
     }
     private fun buildScoresLayout(): Pair<VBox, List<Label>> {
-//        val scoreLayout = VBox()
-//        scoreLayout.alignment = Pos.TOP_RIGHT
-//        val score1 = javafx.scene.control.Label("score 1")
-//        val score2 = javafx.scene.control.Label("score 2")
-//        scoreLayout.children.addAll(score1, score2)
-//        return scoreLayout
-        return buildVerticalPlayerDataLabelLayout(Pos.TOP_RIGHT)
+        return buildVerticalPlayerDataLabelLayout(Pos.TOP_RIGHT, "SCORES")
     }
 
-    private fun buildVerticalPlayerDataLabelLayout(position: Pos): Pair<VBox, List<Label>> {
+    private fun buildVerticalPlayerDataLabelLayout(position: Pos, layoutTitle: String): Pair<VBox, List<Label>> {
         val verticalLayout = VBox()
         verticalLayout.alignment = position
         val playerQuantity = getPlayerQuantity()
         val labelList = ArrayList<Label>();
+        labelList.add(generateLayoutTitle(layoutTitle))
         repeat(playerQuantity) {index ->
             labelList.add(Label("Player " + (index+1) + ": "))
         }
@@ -100,6 +96,13 @@ class Starships() : Application() {
 
         return verticalLayout to labelList
     }
+
+    private fun generateLayoutTitle(title: String): Label {
+        val layoutTitle = Label(title)
+        layoutTitle.id = "layout-title"
+        return layoutTitle
+    }
+
     private fun getPlayerQuantity() : Int = (WindowConfigurator.getInstance().getProperty("players").get() as Long).toInt()
 
     private fun cleanFacade() {
@@ -208,19 +211,35 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
         val newMoverList = ArrayList<Mover<BaseEntity>>()
         if(startingShips > 1) checkMultiplayerVictory()
         else checkGameOver()
+        updateGameState(newShipList, newMoverList)
+
+        gameState = gameState.getCopyWith(newMoverList, newShipList, gameState.removedIds, gameState.scores)
+    }
+
+    private fun updateGameState(newShipList: ArrayList<ShipController>, newMoverList: ArrayList<Mover<BaseEntity>>) {
         updateShips(newShipList)
         removeIdsInScene()
         spawnAsteroid(newMoverList)
         updateMovingEntities(newMoverList)
         updateLabels()
-
-        gameState = gameState.getCopyWith(newMoverList, newShipList, gameState.removedIds, gameState.scores)
     }
 
-    private fun updateLabels() {
+    private fun updateLabels(){
+        updateScoreLabels()
+        updateHealthLabels()
+    }
+
+    private fun updateHealthLabels() {
+        gameState.ships.forEach {
+            val shipNumber = it.id.drop(5).toInt()
+            lifeLabels.get(shipNumber).text = "Player ${(shipNumber-1)}: " + it.health
+        }
+    }
+
+    private fun updateScoreLabels() {
         gameState.scores.forEach {
             val shipNumber = it.key.drop(5).toInt()
-            scoreLabels.get(shipNumber-1).text = "Player ${(shipNumber-1)}: " + it.value
+            scoreLabels.get(shipNumber).text = "Player ${(shipNumber-1)}: " + it.value
         }
     }
 
