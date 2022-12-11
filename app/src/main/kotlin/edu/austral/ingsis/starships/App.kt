@@ -49,7 +49,7 @@ class Starships() : Application() {
         addEventListeners(entityInSceneManager, primaryStage, gameInitializer)
 
         val generalPane = buildGeneralPane()
-        gameScene = Scene(generalPane)
+        gameScene = Scene(generalPane, 950.0, 800.0)
 
         //gameScene = Scene(facade.view)
         addCssToFacade()
@@ -136,9 +136,10 @@ class Starships() : Application() {
 
     private fun addEventListeners(entityInSceneManager: EntityInSceneManager, primaryStage: Stage, gameInitializer: GameInitializer) {
         val gameFinishedListener = GameFinishedListener(primaryStage, startScene, gameInitializer)
-        facade.timeListenable.addEventListener(TimeListener(facade.elements, entityInSceneManager, gameFinishedListener))
+        val outOfBoundsListener = OutOfBoundsListener()
+        facade.timeListenable.addEventListener(TimeListener(facade.elements, entityInSceneManager, gameFinishedListener, facade))
         facade.collisionsListenable.addEventListener(CollisionListener())
-        facade.outOfBoundsListenable.addEventListener(OutOfBoundsListener())
+        facade.outOfBoundsListenable.addEventListener(outOfBoundsListener)
         facade.reachBoundsListenable.addEventListener(ReachBoundsListener())
         keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(gameSaver))
     }
@@ -158,6 +159,8 @@ class Starships() : Application() {
     }
 }
 
+
+
 class EntityInSceneManager(private val facade: ElementsViewFacade){
 
     fun insert(entity: ElementModel){
@@ -172,7 +175,8 @@ class EntityInSceneManager(private val facade: ElementsViewFacade){
 
 class TimeListener(private val elements: ObservableMap<String, ElementModel>,
                    private val inserter: EntityInSceneManager,
-                   private val gameFinishedListener: GameFinishedListener
+                   private val gameFinishedListener: GameFinishedListener,
+                   private val facade: ElementsViewFacade
 
                    ) : EventListener<TimePassed> {
     private val startingShips = (WindowConfigurator.getInstance().getProperty("players").get() as Long).toInt()
@@ -181,6 +185,7 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
     private fun createGameFinishedEmitter(gameFinishedListener: GameFinishedListener): ListenableEmitter<GameEnding> {
         val gameEndingEmitter = ListenableEmitter<GameEnding>()
         gameEndingEmitter.addEventListener(gameFinishedListener)
+
         return gameEndingEmitter
     }
 
@@ -405,8 +410,13 @@ class GameFinishedListener(val primaryStage: Stage, val startScene: Scene, val g
 
 
 class OutOfBoundsListener() : EventListener<OutOfBounds> {
+    var active = false
     override fun handle(event: OutOfBounds) {
-        gameState = gameState.handleOutOfBounds(event.id)
+        //gameState = gameState.handleOutOfBounds(event.id)
+    }
+
+    fun activateListening() {
+        this.active = true
     }
 }
 
