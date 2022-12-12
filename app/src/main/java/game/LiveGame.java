@@ -2,6 +2,7 @@ package game;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.parser.ParseException;
+import persistence.Constants;
 import persistence.gamestate.visitor.Visitor;
 import starships.entities.Asteroid;
 import starships.entities.BaseEntity;
@@ -210,14 +211,6 @@ public class LiveGame implements GameState {
         }
     }
 
-    private static void removePreExistingMover(Optional<BaseEntity> collisionResult, List<Mover> moversCopy) {
-        for (Mover mover : moversCopy) {
-            if(mover.getId().equals(collisionResult.get().getId())){
-                moversCopy.remove(mover);
-            }
-        }
-    }
-
 
     private Mover getCollidedEntityMover(Optional<BaseEntity> collisionResult, List<ShipController> shipsCopy, List<Mover> moversCopy) {
         Mover originalMover = findMover(collisionResult.get().getId()).get();
@@ -262,21 +255,10 @@ public class LiveGame implements GameState {
         return asteroidSpawner.spawnAsteroid(targetShipPosition);
     }
 
-    public List<String> pureAddString(List<String> list, String elem){
-        List<String> newList = new ArrayList<>(list);
-        list.add(elem);
-        return list;
-    }
-
-    public List<ShipController> removeShip(List<ShipController> list, ShipController shipController){
-        List<ShipController> listCopy = new ArrayList<>(list);
-        listCopy.remove(shipController);
-        return listCopy;
-    }
 
     public GameState shoot(String shipId){
         Optional<ShipController> foundShip = findShip(shipId);
-        if(foundShip.isPresent() && movingBulletQuantity() < 70){
+        if(foundShip.isPresent() && movingBulletQuantity() < Constants.MAX_MOVING_ENTITIES){
             List<Mover<Bullet>> shotBullets = foundShip.get().shoot();
             List<Mover> newMovers = new ArrayList<>(this.movingEntities);
             newMovers.addAll(shotBullets);
@@ -351,11 +333,6 @@ public class LiveGame implements GameState {
         return Optional.empty();
     }
 
-    public List<Mover> removeMovingEntity(List<Mover> list, Mover entity) {
-        List<Mover> listCopy = new ArrayList<>(list);
-        listCopy.remove(entity);
-        return listCopy;
-    }
 
     public GameState stopShip(String shipId){
         Optional<ShipController> stoppingShipOpt = findShip(shipId);
@@ -369,14 +346,10 @@ public class LiveGame implements GameState {
     }
 
     @Override
-    public GameState pause() {
+    public GameState togglePause() {
         return new PausedGame(this);
     }
 
-    @Override
-    public GameState unpause() {
-        return this;
-    }
 
     @Override
     public GameState getCopyWith(List<Mover> movers, List<ShipController> ships, List<String> removedIds, Map<String, Integer> scores) {

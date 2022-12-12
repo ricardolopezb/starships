@@ -104,14 +104,10 @@ public class OutOfBoundsIgnoringGame implements GameState{
     }
 
     @Override
-    public GameState pause() {
-        return liveGame.pause();
+    public GameState togglePause() {
+        return liveGame.togglePause();
     }
 
-    @Override
-    public GameState unpause() {
-        return liveGame.unpause();
-    }
 
     @Override
     public GameState getCopyWith(List<Mover> movers, List<ShipController> ships, List<String> removedIds, Map<String, Integer> scores) {

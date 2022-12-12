@@ -22,8 +22,7 @@ public interface GameState extends Visitable {
     Map<String, Integer> getScores();
     List<String> getRemovedIds();
     GameState stopShip(String shipId);
-    GameState pause();
-    GameState unpause();
+    GameState togglePause();
 
     GameState getCopyWith(List<Mover> movers, List<ShipController> ships, List<String> removedIds, Map<String, Integer> scores);
 

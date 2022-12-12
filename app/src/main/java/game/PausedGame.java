@@ -91,14 +91,10 @@ public class PausedGame implements GameState{
     }
 
     @Override
-    public GameState pause() {
+    public GameState togglePause() {
         return this.liveGame;
     }
 
-    @Override
-    public GameState unpause() {
-        return this.liveGame;
-    }
 
     @Override
     public GameState getCopyWith(List<Mover> movers, List<ShipController> ships, List<String> removedIds, Map<String, Integer> scores) {
