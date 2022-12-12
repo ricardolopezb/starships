@@ -143,10 +143,15 @@ public class LiveGame implements GameState {
     }
 
     private boolean shouldNotAddScore(Mover element1, Mover element2) {
-        if(element1.getEntity().getEntityType() == EntityType.BULLET && element2.getEntity().getEntityType() == EntityType.BULLET){
-            return true;
-        }
+        return isMyBullet(element1, element2) || areBothBullets(element1, element2);
+    }
 
+    private boolean areBothBullets(Mover element1, Mover element2) {
+        return element1.getEntity().getEntityType() == EntityType.BULLET
+                && element2.getEntity().getEntityType() == EntityType.BULLET;
+    }
+
+    private boolean isMyBullet(Mover element1, Mover element2) {
         if(element1.getEntity().getEntityType() == EntityType.BULLET) {
             return ((Bullet) element1.getEntity()).getOwnerId().equals(element2.getId());
         }
