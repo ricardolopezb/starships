@@ -1,34 +1,35 @@
 package edu.austral.ingsis.starships
 
 import edu.austral.ingsis.starships.ui.*
+import game.GameState
+import game.LiveGame
+import game.actions.Action
+import game.actions.ActionMapper
 import javafx.application.Application
 import javafx.application.Application.launch
 import javafx.collections.ObservableMap
 import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.Scene
+import javafx.scene.control.Label
 import javafx.scene.input.KeyCode
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
+import javafx.scene.media.MediaPlayer
+import javafx.scene.paint.Color
 import javafx.stage.Stage
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
-import game.LiveGame
-import starships.entities.ship.ShipController
-import starships.entities.BaseEntity
-import starships.movement.Mover
 import persistence.Constants
-import persistence.gamestate.GameStateSaver
 import persistence.WindowConfigurator
-import game.GameState
-import game.actions.Action
-import game.actions.ActionMapper
-import javafx.scene.control.Label
-import javafx.scene.paint.Color
-import javafx.scene.text.TextAlignment
+import persistence.gamestate.GameStateSaver
+import starships.entities.BaseEntity
+import starships.entities.ship.ShipController
+import starships.movement.Mover
+import java.io.File
 import java.io.FileReader
-import java.util.StringJoiner
+
 
 fun main() {
     launch(Starships::class.java)
@@ -41,6 +42,12 @@ class Starships() : Application() {
     private val gameSaver = GameStateSaver()
     var gameScene = Scene(StackPane())
     var startScene = Scene(StackPane())
+    val song = initMusic()
+
+    private fun initMusic(): MediaPlayer {
+        val song = javafx.scene.media.Media(File(Constants.SONG_FILE_PATH).toURI().toString())
+        return MediaPlayer(song)
+    }
 
 
     override fun start(primaryStage: Stage) {
@@ -50,16 +57,23 @@ class Starships() : Application() {
         primaryStage.scene = startScene
         val entityInSceneManager = EntityInSceneManager(facade)
 
-
         val (generalPane, lifeLabels, scoreLabels) = buildGeneralPane()
-        addEventListeners(entityInSceneManager, primaryStage, gameInitializer, lifeLabels, scoreLabels)
+        addEventListeners(entityInSceneManager, primaryStage, lifeLabels, scoreLabels)
         gameScene = Scene(generalPane, 950.0, 800.0)
 
         //gameScene = Scene(facade.view)
         addCssToFacade()
         keyTracker.scene = gameScene
+
+        startMusic()
+
         setUpPrimaryStage(primaryStage, startScene)
         startApplicationComponents(primaryStage)
+    }
+
+    private fun startMusic() {
+        song.volume = 0.015
+        song.play()
     }
 
     private fun addCssToFacade() {
@@ -89,14 +103,19 @@ class Starships() : Application() {
         val verticalLayout = VBox()
         verticalLayout.alignment = position
         val playerQuantity = getPlayerQuantity()
-        val labelList = ArrayList<Label>();
-        labelList.add(generateLayoutTitle(layoutTitle))
-        repeat(playerQuantity) {index ->
-            labelList.add(generateInitialPlayerLabel(index))
-        }
+        val labelList = generateLabelList(layoutTitle, playerQuantity)
         verticalLayout.children.addAll(labelList)
 
         return verticalLayout to labelList
+    }
+
+    private fun generateLabelList(layoutTitle: String, playerQuantity: Int): ArrayList<Label> {
+        val labelList = ArrayList<Label>();
+        labelList.add(generateLayoutTitle(layoutTitle))
+        repeat(playerQuantity) { index ->
+            labelList.add(generateInitialPlayerLabel(index))
+        }
+        return labelList
     }
 
     private fun generateInitialPlayerLabel(index: Int): Label {
@@ -109,8 +128,6 @@ class Starships() : Application() {
     private fun generateLayoutTitle(title: String): Label {
         val layoutTitle = Label(title)
         layoutTitle.textFill = Color.WHITE
-        //layoutTitle.textAlignment = TextAlignment.CENTER
-        //layoutTitle.style = "-fx-font-weight: bold;"
         return layoutTitle
     }
 
@@ -122,7 +139,7 @@ class Starships() : Application() {
     }
 
     fun generateStartScene(primaryStage: Stage, gameInitializer: GameInitializer): Scene {
-        val gameTitle = javafx.scene.control.Label("Starships")
+        val gameTitle = Label("Starships")
         primaryStage.title = "Starships"
         val newGameButton = createGameStartButton(gameInitializer, primaryStage, GameInitializer.GameStart.NEW, "New Game")
         val loadGameButton = createGameStartButton(gameInitializer, primaryStage, GameInitializer.GameStart.LOAD, "Load Game")
@@ -159,14 +176,14 @@ class Starships() : Application() {
         primaryStage.width = (windowConfigurator.getProperty("width").get() as Long).toDouble()
     }
 
-    private fun addEventListeners(entityInSceneManager: EntityInSceneManager, primaryStage: Stage, gameInitializer: GameInitializer, lifeLabels: List<Label>, scoreLabels: List<Label>) {
-        val gameFinishedListener = GameFinishedListener(primaryStage, startScene, gameInitializer)
+    private fun addEventListeners(entityInSceneManager: EntityInSceneManager, primaryStage: Stage, lifeLabels: List<Label>, scoreLabels: List<Label>) {
+        val gameFinishedListener = GameFinishedListener(primaryStage)
         val outOfBoundsListener = OutOfBoundsListener()
-        facade.timeListenable.addEventListener(TimeListener(facade.elements, entityInSceneManager, gameFinishedListener, facade, lifeLabels, scoreLabels))
+        facade.timeListenable.addEventListener(TimeListener(facade.elements, entityInSceneManager, gameFinishedListener, lifeLabels, scoreLabels))
         facade.collisionsListenable.addEventListener(CollisionListener())
         facade.outOfBoundsListenable.addEventListener(outOfBoundsListener)
         facade.reachBoundsListenable.addEventListener(ReachBoundsListener())
-        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener(gameSaver))
+        keyTracker.keyPressedListenable.addEventListener(KeyPressedListener())
     }
 
     fun insertCoreEntitiesIntoUI() {
@@ -201,7 +218,6 @@ class EntityInSceneManager(private val facade: ElementsViewFacade){
 class TimeListener(private val elements: ObservableMap<String, ElementModel>,
                    private val inserter: EntityInSceneManager,
                    private val gameFinishedListener: GameFinishedListener,
-                   private val facade: ElementsViewFacade,
                    private var lifeLabels: List<Label>,
                    private var scoreLabels: List<Label>
 
@@ -269,7 +285,6 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
 
     private fun checkMultiplayerVictory() {
         if(gameState.ships.size == 1 && !gameFinishedListener.called){
-            //println(gameState.ships[0].id + " won!")
             gameFinishedEmitter.emit(GameEnding("WIN", gameState.ships[0].id.drop(5)))
         }
     }
@@ -281,18 +296,21 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
             val updatedMoverElementModel = updatedMover.adapt()
 
             if (elements.containsKey(it.id)) {
-                elements[it.id]?.x?.set(updatedMoverElementModel.x.value)
-                elements[it.id]?.y?.set(updatedMoverElementModel.y.value)
-                if(it.id.startsWith("Asteroid"))
-                    elements[it.id]?.rotationInDegrees?.set(elements[it.id]?.rotationInDegrees!!.value + 1)
-                    elements[it.id]?.height?.set(updatedMoverElementModel.height.value)
-                    elements[it.id]?.width?.set(updatedMoverElementModel.width.value)
+                updateMovingEntitiesInFacadeValues(it, updatedMoverElementModel)
             } else {
                 inserter.insert(updatedMoverElementModel)
-                //elements[updatedMoverElementModel.id] = updatedMoverElementModel
             }
             newMoverList.add(updatedMover)
         }
+    }
+
+    private fun updateMovingEntitiesInFacadeValues(it: Mover<BaseEntity>, updatedMoverElementModel: ElementModel) {
+        elements[it.id]?.x?.set(updatedMoverElementModel.x.value)
+        elements[it.id]?.y?.set(updatedMoverElementModel.y.value)
+        if (it.id.startsWith("Asteroid"))
+            elements[it.id]?.rotationInDegrees?.set(elements[it.id]?.rotationInDegrees!!.value + 1)
+        elements[it.id]?.height?.set(updatedMoverElementModel.height.value)
+        elements[it.id]?.width?.set(updatedMoverElementModel.width.value)
     }
 
     private fun spawnAsteroid(newMoverList: ArrayList<Mover<BaseEntity>>){
@@ -323,11 +341,15 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
         gameState.ships.forEach {
             val updatedShip = it.update()
             val updatedShipElementModel = updatedShip.adapt()
-            elements[it.id]?.x?.set(updatedShipElementModel.x.value)
-            elements[it.id]?.y?.set(updatedShipElementModel.y.value)
-            elements[it.id]?.rotationInDegrees?.set(updatedShipElementModel.rotationInDegrees.value)
+            updateElementInFacadeValues(it, updatedShipElementModel)
             newShipList.add(updatedShip)
         }
+    }
+
+    private fun updateElementInFacadeValues(it: ShipController, updatedShipElementModel: ElementModel) {
+        elements[it.id]?.x?.set(updatedShipElementModel.x.value)
+        elements[it.id]?.y?.set(updatedShipElementModel.y.value)
+        elements[it.id]?.rotationInDegrees?.set(updatedShipElementModel.rotationInDegrees.value)
     }
 }
 
@@ -335,22 +357,19 @@ class CollisionListener() : EventListener<Collision> {
     override fun handle(event: Collision) {
         gameState = gameState.handleCollision(event.element1Id, event.element2Id)
     }
-
 }
 
-class KeyPressedListener(val gameSaver: GameStateSaver): EventListener<KeyPressed> {
+class KeyPressedListener(): EventListener<KeyPressed> {
 
     var keyBindingMap = insertBindings()
 
     fun insertBindings(): Map<KeyCode, Action>{
-        //val mapToReturn = HashMap<String, Map<String, KeyCode>>()
         val mapToReturn = HashMap<KeyCode, Action>()
         val it: Iterator<*> = getKeybindingsMapIterator()
         var id = 1
         while (it.hasNext()) {
             val binding = it.next() as JSONObject
             loadMapWithBindings(binding, ("Ship-"+id), mapToReturn)
-            //mapToReturn["Ship-"+id] = bindingMap
             id++
 
         }
@@ -365,16 +384,6 @@ class KeyPressedListener(val gameSaver: GameStateSaver): EventListener<KeyPresse
         }
     }
 
-//    private fun loadMapWithBindings(binding: JSONObject) = mapOf(
-//            "accelerate" to KeyCode.valueOf(binding.get("accelerate") as String),
-//            "brake" to KeyCode.valueOf(binding.get("brake") as String),
-//            "rotate_clockwise" to KeyCode.valueOf(binding.get("rotate_clockwise") as String),
-//            "rotate_counterclockwise" to KeyCode.valueOf(binding.get("rotate_counterclockwise") as String),
-//            "shoot" to KeyCode.valueOf(binding.get("shoot") as String),
-//            "change_weapon" to KeyCode.valueOf(binding.get("change_weapon") as String),
-//            "pause" to KeyCode.valueOf(binding.get("pause") as String),
-//            "save" to KeyCode.valueOf(binding.get("save") as String)
-//    )
 
     private fun getKeybindingsMapIterator(): Iterator<*> {
         val obj = JSONParser().parse(FileReader(Constants.KEYBINDINGS_FILE_PATH))
@@ -388,38 +397,17 @@ class KeyPressedListener(val gameSaver: GameStateSaver): EventListener<KeyPresse
             gameState = keyBindingMap.get(event.key)!!.applyAction(gameState)
     }
 
-//    private fun handlePressedKeyAction(pressedKey: KeyCode, keyCodeMap: Map<String, KeyCode>, shipId: String) {
-//        when (pressedKey) {
-//            keyCodeMap["accelerate"] -> gameState = gameState.accelerateShip(shipId, Constants.SHIP_ACCELERATION_COEFFICIENT)
-//            keyCodeMap["brake"] -> gameState = gameState.stopShip(shipId)
-//            keyCodeMap["rotate_clockwise"] -> gameState = gameState.rotateShip(shipId, Constants.SHIP_ROTATION_DEGREES)
-//            keyCodeMap["rotate_counterclockwise"] -> gameState = gameState.rotateShip(shipId, -Constants.SHIP_ROTATION_DEGREES)
-//            keyCodeMap["shoot"] -> gameState = gameState.shoot(shipId)
-//            keyCodeMap["change_weapon"] -> gameState = gameState.changeWeapon(shipId)
-//            //keyCodeMap["pause"] -> Starships.paused = !Starships.paused
-//            keyCodeMap["pause"] -> gameState = gameState.pause()
-//            keyCodeMap["save"] -> gameSaver.saveGameState(gameState)
-//            else -> {}
-//        }
-//    }
-
 }
 
 data class GameEnding(val endingType: String, val winnerId: String)
 
 
 
-class GameFinishedListener(val primaryStage: Stage, val startScene: Scene, val gameInitializer: GameInitializer): EventListener<GameEnding> {
+class GameFinishedListener(val primaryStage: Stage): EventListener<GameEnding> {
     var called = false
     private fun createGameOverScene(): Scene {
-        val gameOverLabel = javafx.scene.control.Label("Game Over")
-//        val playAgainButton = javafx.scene.control.Button("Play again")
-//        playAgainButton.onAction = EventHandler {
-//            gameState = gameInitializer.selectGameStart(GameInitializer.GameStart.NEW)
-//            primaryStage.scene = startScene
-//        }
-
-        val scoresLabel = javafx.scene.control.Label(generateScoresString())
+        val gameOverLabel = Label("Game Over")
+        val scoresLabel = Label(generateScoresString())
         val layout = VBox()
         layout.children.addAll(gameOverLabel, scoresLabel)
         return Scene(layout)
@@ -447,12 +435,8 @@ class GameFinishedListener(val primaryStage: Stage, val startScene: Scene, val g
     }
 
     private fun createWinningScene(winnerId: String): Scene {
-        val gameOverLabel = javafx.scene.control.Label("Player $winnerId wins!")
-//        val playAgainButton = javafx.scene.control.Button("Play again")
-//        playAgainButton.onAction = EventHandler {
-//            primaryStage.scene = startScene
-//        }
-        val scoresLabel = javafx.scene.control.Label(generateScoresString())
+        val gameOverLabel = Label("Player $winnerId wins!")
+        val scoresLabel = Label(generateScoresString())
         val layout = VBox()
         layout.children.addAll(gameOverLabel, scoresLabel)
         return Scene(layout)
@@ -465,10 +449,6 @@ class OutOfBoundsListener() : EventListener<OutOfBounds> {
     var active = false
     override fun handle(event: OutOfBounds) {
         gameState = gameState.handleOutOfBounds(event.id)
-    }
-
-    fun activateListening() {
-        this.active = true
     }
 }
 

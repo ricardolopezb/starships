@@ -24,6 +24,9 @@ public class Constants {
 
     public static final String INITIAL_CONFIG_FILE_PATH = System.getProperty("user.dir") +
             "/app/src/main/java/persistence/files/initial_config_file.json";
+    public static final String SONG_FILE_PATH = System.getProperty("user.dir") +
+            "/app/src/main/resources/song.mp3";
+
 
 
     public static final Integer SHIP_SPAWN_POSITION_OFFSET = 70;

@@ -28,7 +28,7 @@ dependencies {
 
 javafx {
     version = "18"
-    modules = listOf("javafx.graphics", "javafx.controls")
+    modules = listOf("javafx.graphics", "javafx.controls", "javafx.media")
 }
 
 application {
