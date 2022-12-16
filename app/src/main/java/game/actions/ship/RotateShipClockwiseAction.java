@@ -1,10 +1,10 @@
 package game.actions.ship;
 
 import game.GameState;
-import game.actions.Action;
+import game.actions.GameStateAction;
 import persistence.Constants;
 
-public class RotateShipClockwiseAction implements Action {
+public class RotateShipClockwiseAction implements GameStateAction {
     private final String shipId;
 
     public RotateShipClockwiseAction(String shipId) {

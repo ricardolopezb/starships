@@ -4,8 +4,8 @@ import game.actions.game.PauseGameAction;
 import game.actions.game.SaveGameStateAction;
 import game.actions.ship.*;
 
-public class ActionMapper {
-    public static Action getShipActionForDescription(String shipId, String description){
+public class GameStateActionMapper {
+    public static GameStateAction getShipActionForDescription(String shipId, String description){
         return switch (description){
             case "accelerate" -> new AccelerateShipAction(shipId);
             case "brake" -> new StopShipAction(shipId);

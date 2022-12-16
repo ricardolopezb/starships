@@ -18,5 +18,15 @@
         "change_weapon": "O",
         "pause": "P",
         "save": "ENTER"
+    },
+    {
+        "accelerate": "DIGIT1",
+        "brake": "DIGIT2",
+        "rotate_clockwise": "DIGIT3",
+        "rotate_counterclockwise": "DIGIT4",
+        "shoot": "DIGIT5",
+        "change_weapon": "DIGIT6",
+        "pause": "DIGIT7",
+        "save": "DIGIT8"
     }
 ]

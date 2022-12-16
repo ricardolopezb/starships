@@ -1,9 +1,9 @@
 package game.actions.ship;
 
 import game.GameState;
-import game.actions.Action;
+import game.actions.GameStateAction;
 
-public class ChangeWeaponAction implements Action {
+public class ChangeWeaponAction implements GameStateAction {
     private final String shipId;
 
     public ChangeWeaponAction(String shipId) {

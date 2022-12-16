@@ -1,9 +1,9 @@
 package game.actions.ship;
 
 import game.GameState;
-import game.actions.Action;
+import game.actions.GameStateAction;
 
-public class StopShipAction implements Action {
+public class StopShipAction implements GameStateAction {
     private final String shipId;
 
     public StopShipAction(String shipId) {

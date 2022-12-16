@@ -2,6 +2,6 @@ package game.actions;
 
 import game.GameState;
 
-public interface Action {
+public interface GameStateAction {
     GameState applyAction(GameState gameState);
 }

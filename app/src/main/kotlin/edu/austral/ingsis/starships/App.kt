@@ -3,8 +3,8 @@ package edu.austral.ingsis.starships
 import edu.austral.ingsis.starships.ui.*
 import game.GameState
 import game.LiveGame
-import game.actions.Action
-import game.actions.ActionMapper
+import game.actions.GameStateAction
+import game.actions.GameStateActionMapper
 import javafx.application.Application
 import javafx.application.Application.launch
 import javafx.collections.ObservableMap
@@ -110,7 +110,7 @@ class Starships() : Application() {
     }
 
     private fun generateLabelList(layoutTitle: String, playerQuantity: Int): ArrayList<Label> {
-        val labelList = ArrayList<Label>();
+        val labelList = ArrayList<Label>()
         labelList.add(generateLayoutTitle(layoutTitle))
         repeat(playerQuantity) { index ->
             labelList.add(generateInitialPlayerLabel(index))
@@ -272,7 +272,7 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
 
     private fun checkGameOver() {
         if(gameState.ships.isEmpty() && areDestroyedShips() && !gameFinishedListener.called)
-            gameFinishedEmitter.emit(GameEnding("DESTRUCTION", "0"))
+            gameFinishedEmitter.emit(GameEnding("SINGLEPLAYER", "0"))
     }
 
     private fun areDestroyedShips(): Boolean {
@@ -285,7 +285,7 @@ class TimeListener(private val elements: ObservableMap<String, ElementModel>,
 
     private fun checkMultiplayerVictory() {
         if(gameState.ships.size == 1 && !gameFinishedListener.called){
-            gameFinishedEmitter.emit(GameEnding("WIN", gameState.ships[0].id.drop(5)))
+            gameFinishedEmitter.emit(GameEnding("MULTIPLAYER", gameState.ships[0].id.drop(5)))
         }
     }
 
@@ -363,8 +363,8 @@ class KeyPressedListener(): EventListener<KeyPressed> {
 
     var keyBindingMap = insertBindings()
 
-    fun insertBindings(): Map<KeyCode, Action>{
-        val mapToReturn = HashMap<KeyCode, Action>()
+    fun insertBindings(): Map<KeyCode, GameStateAction>{
+        val mapToReturn = HashMap<KeyCode, GameStateAction>()
         val it: Iterator<*> = getKeybindingsMapIterator()
         var id = 1
         while (it.hasNext()) {
@@ -376,10 +376,10 @@ class KeyPressedListener(): EventListener<KeyPressed> {
         return mapToReturn
     }
 
-    private fun loadMapWithBindings(binding: JSONObject, shipId: String, bindingsMap: MutableMap<KeyCode, Action>) {
+    private fun loadMapWithBindings(binding: JSONObject, shipId: String, bindingsMap: MutableMap<KeyCode, GameStateAction>) {
         val existingActions = binding.keys as Set<String>
         existingActions.forEach {
-            val correspondingAction = ActionMapper.getShipActionForDescription(shipId, it)
+            val correspondingAction = GameStateActionMapper.getShipActionForDescription(shipId, it)
             bindingsMap.put(KeyCode.valueOf(binding.get(it) as String), correspondingAction)
         }
     }
@@ -403,7 +403,7 @@ data class GameEnding(val endingType: String, val winnerId: String)
 
 
 
-class GameFinishedListener(val primaryStage: Stage): EventListener<GameEnding> {
+class GameFinishedListener(private val primaryStage: Stage): EventListener<GameEnding> {
     var called = false
     private fun createGameOverScene(): Scene {
         val gameOverLabel = Label("Game Over")
@@ -425,10 +425,10 @@ class GameFinishedListener(val primaryStage: Stage): EventListener<GameEnding> {
 
     override fun handle(event: GameEnding) {
         called = true
-        if(event.endingType.equals("DESTRUCTION")){
+        if(event.endingType.equals("SINGLEPLAYER")){
             val gameOverScene = createGameOverScene()
             primaryStage.scene = gameOverScene
-        } else if(event.endingType.equals("WIN")){
+        } else if(event.endingType.equals("MULTIPLAYER")){
             val winningScene = createWinningScene(event.winnerId)
             primaryStage.scene = winningScene
         }
@@ -446,7 +446,6 @@ class GameFinishedListener(val primaryStage: Stage): EventListener<GameEnding> {
 
 
 class OutOfBoundsListener() : EventListener<OutOfBounds> {
-    var active = false
     override fun handle(event: OutOfBounds) {
         gameState = gameState.handleOutOfBounds(event.id)
     }
