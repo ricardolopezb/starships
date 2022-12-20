@@ -4,17 +4,25 @@
     "ships": [
         {
             "skin": "BASIC",
-            "health": 150,
+            "health": 250,
+            "weaponType": "LASER"
+        },
+        {
+            "skin": "BASIC",
+            "health": 250,
+            "weaponType": "EXPLOSIVE"
+        },
+        {
+            "skin": "BASIC",
+            "health": 400,
             "weaponType": "LASER"
         }
-
-
 
     ],
 
     "window": {
         "height": 800,
         "width": 950,
-        "players": 1
+        "players": 3
     }
 }

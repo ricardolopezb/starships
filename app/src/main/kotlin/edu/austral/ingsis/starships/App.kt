@@ -17,6 +17,7 @@ import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.scene.media.MediaPlayer
 import javafx.scene.paint.Color
+import javafx.scene.text.Font
 import javafx.stage.Stage
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
@@ -72,7 +73,7 @@ class Starships() : Application() {
     }
 
     private fun startMusic() {
-        song.volume = 0.015
+        song.volume = Constants.MUSIC_VOLUME
         song.play()
     }
 
@@ -121,6 +122,7 @@ class Starships() : Application() {
     private fun generateInitialPlayerLabel(index: Int): Label {
         val label = Label("Player " + (index+1) + ": ")
         label.textFill = Color.WHITE
+        label.font = Font("Arial", 15.0)
         return label
 
     }
@@ -128,6 +130,7 @@ class Starships() : Application() {
     private fun generateLayoutTitle(title: String): Label {
         val layoutTitle = Label(title)
         layoutTitle.textFill = Color.WHITE
+        layoutTitle.font = Font("Arial", 25.0)
         return layoutTitle
     }
 
@@ -371,7 +374,6 @@ class KeyPressedListener(): EventListener<KeyPressed> {
             val binding = it.next() as JSONObject
             loadMapWithBindings(binding, ("Ship-"+id), mapToReturn)
             id++
-
         }
         return mapToReturn
     }

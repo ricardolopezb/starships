@@ -14,6 +14,7 @@ public class Constants {
     public static final Double ASTEROID_SPEED = 1.1; //1.2
     public static final Double SHIP_ACCELERATION_COEFFICIENT = 0.5;
     public static final Double SHIP_BRAKE_COEFFICIENT = -0.4;
+
     public static final Integer SHIP_ROTATION_DEGREES = 25;
 
 
@@ -34,4 +35,6 @@ public class Constants {
     public static final Integer STARTING_Y_COORD = 150;
     public static final String SAVE_FILE_PATH = System.getProperty("user.dir") + "/app/src/main/java/persistence/files/save_file.json";;
     public static final Integer MAX_MOVING_ENTITIES = 70;
+
+    public static final Double MUSIC_VOLUME = 0.5;
 }
